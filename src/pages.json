@@ -45,6 +45,18 @@
             "style": {
                 "navigationBarTitleText": "我"
             }
+        },
+        {
+            "path": "pages/agreement/user/index",
+            "style": {
+                "navigationBarTitleText": "用户协议"
+            }
+        },
+        {
+            "path": "pages/agreement/privacy/index",
+            "style": {
+                "navigationBarTitleText": "隐私政策"
+            }
         }
     ],
     // 分包

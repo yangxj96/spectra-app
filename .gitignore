@@ -163,5 +163,8 @@ env.properties
 .mise.local.toml
 .agentscope
 
+# uni-app 构建产物
+unpackage/
+
 # 忽略特定测试文件
 **/src/test/**/jasypt/**.java

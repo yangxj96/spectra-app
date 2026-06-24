@@ -1,0 +1,30 @@
+{
+    "app": {
+        "name": "Spectra",
+        "splash": "Starting"
+    },
+    "tab": {
+        "message": "Messages",
+        "contacts": "Contacts",
+        "workbench": "Workbench",
+        "mine": "Me"
+    },
+    "login": {
+        "title": "Welcome",
+        "username": "Username",
+        "password": "Password",
+        "captcha": "Captcha",
+        "submit": "Login",
+        "submitting": "Logging in...",
+        "success": "Login successful",
+        "error_empty_username": "Please enter username",
+        "error_empty_password": "Please enter password",
+        "error_empty_captcha": "Please enter captcha"
+    },
+    "common": {
+        "loading": "Loading...",
+        "network_error": "Network error, please check connection",
+        "confirm": "OK",
+        "cancel": "Cancel"
+    }
+}

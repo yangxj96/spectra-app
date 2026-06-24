@@ -18,6 +18,7 @@
 <script setup lang="ts">
 import { bootstrap } from "@/helper/bootstrap";
 import useAppStore from "@/stores/app";
+import { STORAGE_KEY_TOKEN } from "@/config/env";
 import { onMounted } from "vue";
 
 const appStore = useAppStore();
@@ -31,16 +32,17 @@ onMounted(async () => {
 
 function next() {
     if (appStore.isFirstLaunch) {
-        uni.reLaunch({ url: "/pages/message/index" });
+        uni.switchTab({ url: "/pages/message/index" });
         return;
     }
 
-    if (!appStore.token) {
-        uni.reLaunch({ url: "/pages/login/login" });
+    const token = uni.getStorageSync(STORAGE_KEY_TOKEN);
+    if (!token) {
+        uni.reLaunch({ url: "/pages/login/index" });
         return;
     }
 
-    uni.reLaunch({ url: "/pages/message/index" });
+    uni.switchTab({ url: "/pages/message/index" });
 }
 </script>
 

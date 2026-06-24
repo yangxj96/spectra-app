@@ -1,18 +1,35 @@
 <script setup lang="ts">
 import { DEFAULT_AVATAR } from "@/config/default";
-import { useAuthGuard } from "@/hooks/useAuthGuard";
+import useAppStore from "@/stores/app";
 import { ref } from "vue";
 
-// #ifdef MP-WEIXIN
-useAuthGuard();
-// #endif
+const appStore = useAppStore();
 
 const userAvatar = ref("/static/example/avatar.jpg");
 
-// 头像加载失败回调,去除头像显示默认图
+// 头像加载失败回调
 const handleAvatarError = () => {
     userAvatar.value = DEFAULT_AVATAR;
 };
+
+/** 退出登录 */
+function handleLogout() {
+    uni.showModal({
+        title: "提示",
+        content: "确定要退出登录吗？",
+        confirmText: "退出",
+        cancelText: "取消",
+        success(res) {
+            if (res.confirm) {
+                appStore.clearAuth();
+                uni.showToast({ title: "已退出登录", icon: "success" });
+                setTimeout(() => {
+                    uni.reLaunch({ url: "/pages/login/index" });
+                }, 500);
+            }
+        }
+    });
+}
 </script>
 
 <template>
@@ -70,6 +87,16 @@ const handleAvatarError = () => {
             </t-cell-group>
         </view>
 
+        <!-- 退出登录 -->
+        <view class="features-group">
+            <t-cell-group>
+                <t-cell hover @click="handleLogout">
+                    <template #title>
+                        <text style="color: #e74c3c; text-align: center; width: 100%;">退出登录</text>
+                    </template>
+                </t-cell>
+            </t-cell-group>
+        </view>
         <!-- #ifdef APP -->
     </scroll-view>
     <!-- #endif -->

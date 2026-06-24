@@ -1,14 +1,24 @@
 import { defineStore } from "pinia";
+import type { UserInfo } from "@/types";
 
 const useAppStore = defineStore("app", {
     state: () => ({
+        /** 启动完成标志 */
         ready: false,
+        /** 登录 token */
         token: "",
-        userInfo: null as any,
+        /** 当前用户信息 */
+        userInfo: null as UserInfo | null,
+        /** 是否首次启动 */
         isFirstLaunch: true,
-        // 推送ID
+        /** uniPush 客户端 ID */
         push_id: ""
     }),
+
+    getters: {
+        /** 是否已登录 */
+        isLoggedIn: state => !!state.token
+    },
 
     actions: {
         setReady(val: boolean) {
@@ -17,7 +27,7 @@ const useAppStore = defineStore("app", {
         setToken(token: string) {
             this.token = token;
         },
-        setUser(user: any) {
+        setUser(user: UserInfo | null) {
             this.userInfo = user;
         },
         setFirstLaunch(val: boolean) {
@@ -25,6 +35,13 @@ const useAppStore = defineStore("app", {
         },
         setPushId(id: string) {
             this.push_id = id;
+        },
+        /** 清除登录状态 */
+        clearAuth() {
+            this.token = "";
+            this.userInfo = null;
+            uni.removeStorageSync("token");
+            uni.removeStorageSync("refresh_token");
         }
     }
 });

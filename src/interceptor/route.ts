@@ -1,3 +1,5 @@
+import { DEV_MODE, STORAGE_KEY_REFRESH_TOKEN, STORAGE_KEY_TOKEN } from "@/config/env";
+
 // 需要拦截的导航方法
 const methods = ["navigateTo", "redirectTo", "reLaunch", "switchTab"] as const;
 
@@ -23,7 +25,7 @@ let isRedirecting = false;
  * 校验步骤（按顺序执行）:
  *
  * 1. 从本地存储获取 token
- *    - 使用 uni.getStorageSync("token") 读取
+ *    - 使用 uni.getStorageSync(STORAGE_KEY_TOKEN) 读取
  *    - token 不存在则直接判定为未登录
  *
  * 2. 解析 token 判断是否过期
@@ -38,51 +40,42 @@ let isRedirecting = false;
  *    - 刷新失败或不存在 refresh_token：进入步骤 4
  *
  * 4. 清除本地登录状态
- *    - uni.removeStorageSync("token")
- *    - uni.removeStorageSync("refresh_token")
+ *    - uni.removeStorageSync(STORAGE_KEY_TOKEN)
+ *    - uni.removeStorageSync(STORAGE_KEY_REFRESH_TOKEN)
  *    - 如有其他用户相关缓存一并清除
  *    - 返回 false
  *
  * @returns true 表示已登录/token 有效，false 表示需要重新登录
  */
 function validateToken(): boolean {
-    // TODO: 步骤 1 - 从本地存储读取 token
-    // const token = uni.getStorageSync("token") as string | null;
-    // if (!token) return false;
+    // 步骤 1 - 从本地存储读取 token
+    const token = uni.getStorageSync(STORAGE_KEY_TOKEN) as string | null;
+    if (!token) return false;
 
-    // TODO: 步骤 2 - 校验 token 是否过期
+    // 步骤 2 - 校验 token 是否过期
     // 解析 JWT 示例：
     // try {
     //     const payload = JSON.parse(atob(token.split(".")[1]));
     //     const expired = payload.exp * 1000 < Date.now();
     //     if (!expired) return true;
     // } catch {
-    //     // 非 JWT 格式，调用后端接口校验
+    //     // 非 JWT 格式，调用后端接口校验（异步校验需改造为 Promise）
     // }
 
-    // TODO: 步骤 3 - token 过期，尝试刷新
-    // const refreshToken = uni.getStorageSync("refresh_token") as string | null;
-    // if (refreshToken) {
-    //     try {
-    //         const res = await request<{ token: string; refresh_token: string }>({
-    //             url: "/auth/refresh",
-    //             method: "POST",
-    //             data: { refresh_token: refreshToken }
-    //         });
-    //         if (res.code === 0) {
-    //             uni.setStorageSync("token", res.data.token);
-    //             uni.setStorageSync("refresh_token", res.data.refresh_token);
-    //             return true;
-    //         }
-    //     } catch { /* 刷新失败，继续清除流程 */ }
-    // }
+    // 步骤 3 - token 过期，尝试刷新
+    // 注意：此处为同步拦截器，实际刷新需要异步请求。
+    // 方案一：将 validateToken 改为 async，在 invoke 中 await
+    // 方案二：token 过期时不在此处刷新，依赖 HTTP 层 401 响应自动刷新
+    // 推荐方案二：拦截器仅判断 token 是否存在，过期由 HTTP 层 401 处理
+    // const refreshToken = uni.getStorageSync(STORAGE_KEY_REFRESH_TOKEN) as string | null;
+    // if (refreshToken) { ... }
 
-    // TODO: 步骤 4 - 清除本地登录状态
-    // uni.removeStorageSync("token");
-    // uni.removeStorageSync("refresh_token");
+    // 步骤 4 - 清除本地登录状态（到达此处说明 token 无效）
+    // uni.removeStorageSync(STORAGE_KEY_TOKEN);
+    // uni.removeStorageSync(STORAGE_KEY_REFRESH_TOKEN);
     // return false;
 
-    // 开发阶段暂时放行，实现上述步骤后移除此行
+    // token 存在则放行（深度校验由 HTTP 层 401 拦截处理）
     return true;
 }
 
@@ -95,6 +88,9 @@ function validateToken(): boolean {
 export function checkToken(url?: string): boolean {
     // 白名单直接放行
     if (url && !needLogin(url)) return true;
+
+    // 开发模式跳过校验
+    if (DEV_MODE) return true;
 
     // token 校验通过则放行
     if (validateToken()) return true;
