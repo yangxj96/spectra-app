@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { onLoad } from "@dcloudio/uni-app";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { DEV_MODE, STORAGE_KEY_REFRESH_TOKEN, STORAGE_KEY_TOKEN } from "@/config/env";
 import { post } from "@/services/request";
 import useAppStore from "@/stores/app";
 import type { LoginResponse } from "@/types";
 
+const { t } = useI18n();
 const appStore = useAppStore();
 
 /** 登录成功后跳转的目标路径 */
@@ -85,19 +87,19 @@ function togglePassword() {
 
 async function handleLogin() {
     if (!form.value.username) {
-        uni.showToast({ title: "请输入用户名", icon: "none" });
+        uni.showToast({ title: t("login.error_empty_username"), icon: "none" });
         return;
     }
     if (!form.value.password) {
-        uni.showToast({ title: "请输入密码", icon: "none" });
+        uni.showToast({ title: t("login.error_empty_password"), icon: "none" });
         return;
     }
     if (!form.value.captcha) {
-        uni.showToast({ title: "请输入验证码", icon: "none" });
+        uni.showToast({ title: t("login.error_empty_captcha"), icon: "none" });
         return;
     }
     if (!agreeProtocol.value) {
-        uni.showToast({ title: "请先阅读并同意用户协议", icon: "none" });
+        uni.showToast({ title: t("login.error_agree_protocol"), icon: "none" });
         return;
     }
 
@@ -124,7 +126,7 @@ async function handleLogin() {
         // });
         // handleLoginSuccess(result);
     } catch (err: any) {
-        uni.showToast({ title: err.msg || "登录失败", icon: "none" });
+        uni.showToast({ title: err.msg || t("login.failed"), icon: "none" });
     } finally {
         isLoggingIn.value = false;
     }
@@ -136,7 +138,7 @@ function handleLoginSuccess(result: LoginResponse) {
     appStore.setToken(result.token);
     appStore.setUser(result.user);
 
-    uni.showToast({ title: "登录成功", icon: "success" });
+    uni.showToast({ title: t("login.success"), icon: "success" });
 
     setTimeout(() => {
         const target = redirect.value || "/pages/message/index";
@@ -158,10 +160,10 @@ function goAgreement(type: "user" | "privacy") {
 
 function showComingSoon(feature: string) {
     uni.showModal({
-        title: "提示",
-        content: `"${feature}"功能正在开发中，敬请期待`,
+        title: t("common.tip"),
+        content: t("common.coming_soon", { feature }),
         showCancel: false,
-        confirmText: "知道了"
+        confirmText: t("common.got_it")
     });
 }
 </script>
@@ -173,16 +175,16 @@ function showComingSoon(feature: string) {
             <view class="brand-logo">
                 <image class="logo-img" src="/static/logo.png" mode="aspectFit" />
             </view>
-            <view class="brand-name">光谱</view>
-            <view class="brand-subtitle">高效协同 · 数字办公</view>
+            <view class="brand-name">{{ t("app.name") }}</view>
+            <view class="brand-subtitle">{{ t("login.brand_slogan") }}</view>
         </view>
 
         <!-- 表单卡片区 -->
         <view class="form-card">
             <!-- 欢迎语 -->
             <view class="form-header">
-                <text class="form-title">欢迎回来</text>
-                <text class="form-desc">请输入账号信息登录系统</text>
+                <text class="form-title">{{ t("login.welcome_back") }}</text>
+                <text class="form-desc">{{ t("login.welcome_desc") }}</text>
             </view>
 
             <!-- 用户名 -->
@@ -193,7 +195,7 @@ function showComingSoon(feature: string) {
                 <input
                     class="input-field"
                     v-model="form.username"
-                    placeholder="请输入用户名 / 手机号"
+                    :placeholder="t('login.placeholder_username')"
                     placeholder-style="color: #bbb; font-size: 28rpx;" />
             </view>
 
@@ -206,7 +208,7 @@ function showComingSoon(feature: string) {
                     class="input-field"
                     v-model="form.password"
                     :password="!passwordVisible"
-                    placeholder="请输入密码"
+                    :placeholder="t('login.placeholder_password')"
                     placeholder-style="color: #bbb; font-size: 28rpx;" />
                 <view class="input-suffix" @click="togglePassword">
                     <text>{{ passwordVisible ? "🙈" : "👁️" }}</text>
@@ -221,7 +223,7 @@ function showComingSoon(feature: string) {
                 <input
                     class="input-field"
                     v-model="form.captcha"
-                    placeholder="请输入验证码"
+                    :placeholder="t('login.placeholder_captcha')"
                     placeholder-style="color: #bbb; font-size: 28rpx;"
                     maxlength="4" />
             </view>
@@ -264,7 +266,7 @@ function showComingSoon(feature: string) {
                     </view>
                 </view>
                 <view class="captcha-tip-row">
-                    <text class="captcha-tip-text">看不清？点击刷新</text>
+                    <text class="captcha-tip-text">{{ t("login.captcha_refresh") }}</text>
                 </view>
             </view>
 
@@ -273,26 +275,26 @@ function showComingSoon(feature: string) {
                 <view class="checkbox" :class="{ checked: agreeProtocol }" @tap="agreeProtocol = !agreeProtocol">
                     <text v-if="agreeProtocol" class="check-icon">✓</text>
                 </view>
-                <text class="protocol-text">已阅读并同意</text>
-                <view class="protocol-link" @tap="goAgreement('user')">《用户协议》</view>
-                <text class="protocol-text">和</text>
-                <view class="protocol-link" @tap="goAgreement('privacy')">《隐私政策》</view>
+                <text class="protocol-text">{{ t("login.protocol_agree") }}</text>
+                <view class="protocol-link" @tap="goAgreement('user')">{{ t("login.protocol_user") }}</view>
+                <text class="protocol-text">{{ t("login.protocol_and") }}</text>
+                <view class="protocol-link" @tap="goAgreement('privacy')">{{ t("login.protocol_privacy") }}</view>
             </view>
 
             <!-- 登录按钮 -->
             <button class="login-btn" :disabled="isLoggingIn" @tap="handleLogin">
-                <text v-if="!isLoggingIn">登 录</text>
+                <text v-if="!isLoggingIn">{{ t("login.submit") }}</text>
                 <view v-else class="loading-row">
                     <text class="loading-icon">⏳</text>
-                    <text>登录中...</text>
+                    <text>{{ t("login.submitting") }}</text>
                 </view>
             </button>
 
             <!-- 底部链接 -->
             <view class="form-footer">
-                <view class="footer-link" @tap.stop="showComingSoon('忘记密码')"><text>忘记密码</text></view>
+                <view class="footer-link" @tap.stop="showComingSoon(t('login.forgot_password'))"><text>{{ t("login.forgot_password") }}</text></view>
                 <text class="footer-divider">|</text>
-                <view class="footer-link" @tap.stop="showComingSoon('注册账号')"><text>注册账号</text></view>
+                <view class="footer-link" @tap.stop="showComingSoon(t('login.register'))"><text>{{ t("login.register") }}</text></view>
             </view>
         </view>
 

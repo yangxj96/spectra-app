@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { DEFAULT_AVATAR } from "@/config/default";
 import useAppStore from "@/stores/app";
+import { useI18n } from "vue-i18n";
 import { ref } from "vue";
 
+const { t } = useI18n();
 const appStore = useAppStore();
 
 const userAvatar = ref("/static/example/avatar.jpg");
@@ -15,14 +17,14 @@ const handleAvatarError = () => {
 /** 退出登录 */
 function handleLogout() {
     uni.showModal({
-        title: "提示",
-        content: "确定要退出登录吗？",
-        confirmText: "退出",
-        cancelText: "取消",
+        title: t("common.tip"),
+        content: t("mine.logout_confirm"),
+        confirmText: t("mine.logout_action"),
+        cancelText: t("common.cancel"),
         success(res) {
             if (res.confirm) {
                 appStore.clearAuth();
-                uni.showToast({ title: "已退出登录", icon: "success" });
+                uni.showToast({ title: t("mine.logout_success"), icon: "success" });
                 setTimeout(() => {
                     uni.reLaunch({ url: "/pages/login/index" });
                 }, 500);
@@ -42,13 +44,13 @@ function handleLogout() {
             </uni-col>
             <uni-col :span="16" style="padding-left: 12rpx">
                 <uni-row style="margin-top: 20rpx">
-                    <text style="font-size: 40rpx">道一.</text>
+                    <text style="font-size: 40rpx">{{ t("app.name") }}</text>
                 </uni-row>
                 <uni-row style="margin-top: 20rpx">
-                    <text style="font-size: 32rpx; color: #666">微信号: xxxxxxx</text>
+                    <text style="font-size: 32rpx; color: #666">{{ t("mine.wechat_id", { id: "xxxxxxx" }) }}</text>
                 </uni-row>
                 <uni-row style="margin-top: 20rpx">
-                    <text style="font-size: 32rpx; color: #666">状态: 无</text>
+                    <text style="font-size: 32rpx; color: #666">{{ t("mine.status_label", { status: t("mine.status_none") }) }}</text>
                 </uni-row>
             </uni-col>
         </uni-row>
@@ -59,7 +61,7 @@ function handleLogout() {
         <!-- #endif -->
         <view class="features-group">
             <t-cell-group>
-                <t-cell title="服务" hover arrow>
+                <t-cell :title="t('mine.service')" hover arrow>
                     <template #left-icon>
                         <t-icon prefix="icons" name="service" color="#48B0EB" size="48rpx" />
                     </template>
@@ -69,7 +71,7 @@ function handleLogout() {
 
         <view class="features-group">
             <t-cell-group>
-                <t-cell title="收藏" hover arrow>
+                <t-cell :title="t('mine.favorites')" hover arrow>
                     <template #left-icon>
                         <t-icon prefix="icons" name="collect" color="#FED547" size="48rpx" />
                     </template>
@@ -79,7 +81,7 @@ function handleLogout() {
 
         <view class="features-group">
             <t-cell-group>
-                <t-cell title="设置" hover arrow>
+                <t-cell :title="t('mine.settings')" hover arrow>
                     <template #left-icon>
                         <t-icon prefix="icons" name="settings" color="#38A65A" size="48rpx" />
                     </template>
@@ -92,7 +94,7 @@ function handleLogout() {
             <t-cell-group>
                 <t-cell hover @click="handleLogout">
                     <template #title>
-                        <text style="color: #e74c3c; text-align: center; width: 100%;">退出登录</text>
+                        <text style="color: #e74c3c; text-align: center; width: 100%;">{{ t("mine.logout") }}</text>
                     </template>
                 </t-cell>
             </t-cell-group>

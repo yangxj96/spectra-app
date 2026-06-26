@@ -1,7 +1,8 @@
 {
     "app": {
         "name": "Spectra",
-        "splash": "Starting"
+        "splash": "Starting",
+        "splash_title": "Spectra App"
     },
     "tab": {
         "message": "Messages",
@@ -11,20 +12,130 @@
     },
     "login": {
         "title": "Welcome",
+        "welcome_back": "Welcome Back",
+        "welcome_desc": "Please enter your account information to login",
         "username": "Username",
         "password": "Password",
         "captcha": "Captcha",
+        "placeholder_username": "Username / Phone number",
+        "placeholder_password": "Password",
+        "placeholder_captcha": "Captcha",
         "submit": "Login",
         "submitting": "Logging in...",
         "success": "Login successful",
+        "failed": "Login failed",
         "error_empty_username": "Please enter username",
         "error_empty_password": "Please enter password",
-        "error_empty_captcha": "Please enter captcha"
+        "error_empty_captcha": "Please enter captcha",
+        "error_agree_protocol": "Please read and agree to the user agreement",
+        "captcha_refresh": "Can't read clearly? Click to refresh",
+        "protocol_agree": "I have read and agree to",
+        "protocol_user": "User Agreement",
+        "protocol_and": "and",
+        "protocol_privacy": "Privacy Policy",
+        "forgot_password": "Forgot Password",
+        "register": "Register",
+        "brand_slogan": "Efficient Collaboration · Digital Office"
     },
     "common": {
         "loading": "Loading...",
         "network_error": "Network error, please check connection",
         "confirm": "OK",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "tip": "Notice",
+        "got_it": "Got it",
+        "coming_soon": "\"{feature}\" is under development, stay tuned"
+    },
+    "message": {
+        "title": "Messages",
+        "search_placeholder": "Search",
+        "push_id_current": "Current Push ID: {id}",
+        "push_id_failed": "Failed to get Push ID, it may have failed or not yet obtained."
+    },
+    "contacts": {
+        "title": "Contacts",
+        "search_placeholder": "Search",
+        "new_friends": "New Friends",
+        "group_chat": "Group Chat",
+        "tags": "Tags"
+    },
+    "workbench": {
+        "title": "Workbench",
+        "common": "Common",
+        "attendance": "Attendance",
+        "approval": "Approvals",
+        "my_tasks": "My Tasks",
+        "schedule": "Schedule",
+        "office_collaboration": "Office Collaboration",
+        "doc_center": "Documents",
+        "video_meeting": "Video Meeting",
+        "announcements": "Announcements",
+        "enterprise_email": "Email",
+        "work_report": "Work Report",
+        "file_sharing": "File Sharing",
+        "hr_management": "HR Management",
+        "leave_request": "Leave Request",
+        "reimbursement": "Reimbursement",
+        "salary_query": "Salary Query",
+        "training_center": "Training",
+        "admin_management": "Administration",
+        "visitor_booking": "Visitor Booking",
+        "asset_management": "Assets",
+        "vehicle_request": "Vehicle Request",
+        "meeting_room": "Meeting Room",
+        "seal_request": "Seal Request",
+        "license_management": "Licenses",
+        "office_supplies": "Supplies",
+        "contract_management": "Contracts"
+    },
+    "mine": {
+        "logout_confirm": "Are you sure you want to logout?",
+        "logout_action": "Logout",
+        "logout_success": "Logged out",
+        "wechat_id": "WeChat ID: {id}",
+        "status_label": "Status: {status}",
+        "status_none": "None",
+        "service": "Service",
+        "favorites": "Favorites",
+        "settings": "Settings",
+        "logout": "Logout"
+    },
+    "chat": {
+        "input_placeholder": "Type a message...",
+        "send": "Send"
+    },
+    "group": {
+        "title": "Group Chat"
+    },
+    "agreement": {
+        "user_title": "User Agreement",
+        "privacy_title": "Privacy Policy",
+        "update_date": "Update Date: January 1, 2026",
+        "user_preamble": "Welcome to Spectra (hereinafter referred to as \"the Application\").",
+        "user_s1_title": "I. General Provisions",
+        "user_s1_content": "1.1 This agreement is the agreement between you and the Application regarding the use of the Application services.\n\n1.2 Please read this agreement carefully before using the Application services. By using the Application services, you indicate that you have fully read, understood and agreed to accept all contents of this agreement.\n\n1.3 The Application reserves the right to modify any terms of this agreement at any time. The modified agreement shall take effect upon publication and replace the original agreement.",
+        "user_s2_title": "II. Account Registration and Use",
+        "user_s2_content": "2.1 You shall provide true, accurate and complete personal information when registering an account.\n\n2.2 You shall properly keep your account and password, and be responsible for all activities conducted with your account.\n\n2.3 Without the consent of the Application, you shall not transfer, lend or sell your account to others.",
+        "user_s3_title": "III. User Code of Conduct",
+        "user_s3_content": "3.1 When using the Application, you shall comply with relevant laws and regulations.\n\n3.2 You shall not use the Application to engage in illegal activities, including but not limited to:\nPublishing or spreading illegal or inappropriate information;\nInfringing on intellectual property rights or other legitimate rights of others;\nInterfering with the normal operation of the Application;\nUsing the Application for commercial advertising.\n\n3.3 If a user is found to have violated the rules, the Application has the right to take measures such as warning, restricting functions, suspending or terminating services.",
+        "user_s4_title": "IV. Service Changes and Termination",
+        "user_s4_content": "4.1 The Application reserves the right to change, interrupt or terminate part or all of the services according to business development needs.\n\n4.2 If a user violates the provisions of this agreement, the Application has the right to terminate services to that user.",
+        "user_s5_title": "V. Disclaimer",
+        "user_s5_content": "5.1 The Application shall not be liable for temporary inability to provide services caused by network failures, system maintenance, or third-party reasons.\n\n5.2 The Application shall not be liable for any indirect losses incurred by users due to the use of this service.",
+        "user_s6_title": "VI. Miscellaneous",
+        "user_s6_content": "6.1 The interpretation, validity and dispute resolution of this agreement shall be governed by law.\n\n6.2 If any term of this agreement is deemed invalid, it shall not affect the validity of other terms.",
+        "privacy_preamble": "Spectra (hereinafter referred to as \"we\") understands the importance of personal information to you and will take corresponding security protection measures in accordance with laws and regulations to protect the security of your personal information.",
+        "privacy_s1_title": "I. Information Collection",
+        "privacy_s1_content": "1.1 We will collect your username, phone number and other necessary information when you register an account.\n\n1.2 To provide instant messaging services, we will collect your message content and contacts information.\n\n1.3 To optimize product experience, we will collect device information (device model, operating system version), log information and usage behavior data.",
+        "privacy_s2_title": "II. Information Use",
+        "privacy_s2_content": "2.1 We use the collected information to provide, maintain and improve our services.\n\n2.2 We may use your information to push service-related notifications to you.\n\n2.3 Without your prior consent, we will not provide your personal information to third parties, unless otherwise specified by laws and regulations.",
+        "privacy_s3_title": "III. Information Storage and Protection",
+        "privacy_s3_content": "3.1 Your personal information will be stored within the territory.\n\n3.2 We use security measures such as data encryption and access control to protect your information.\n\n3.3 We will only retain your personal information for the time necessary to achieve the purpose of the service.",
+        "privacy_s4_title": "IV. Your Rights",
+        "privacy_s4_content": "4.1 You have the right to access, correct and delete your personal information.\n\n4.2 You have the right to withdraw consent, and the withdrawal shall not affect the information processing already conducted based on consent.\n\n4.3 You have the right to cancel your account, and we will delete your personal information after cancellation.",
+        "privacy_s5_title": "V. Protection of Minors",
+        "privacy_s5_content": "5.1 We attach special importance to the protection of personal information of minors.\n\n5.2 Minors under the age of 14 should obtain the consent of their guardians before using this service.",
+        "privacy_s6_title": "VI. Policy Updates",
+        "privacy_s6_content": "6.1 We may revise this privacy policy from time to time.\n\n6.2 The revised policy will be published on this page, and major changes will be notified to you through pop-ups or other prominent means.\n\n6.3 If you have any questions about the privacy policy, you can contact us through the in-app feedback channel."
     }
 }

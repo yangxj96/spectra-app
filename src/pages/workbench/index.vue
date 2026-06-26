@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { DEFAULT_FEATURE } from "@/config/default";
+import { useI18n } from "vue-i18n";
 import { ref } from "vue";
 
+const { t } = useI18n();
+
 interface MenuItem {
-    name: string;
+    nameKey: string;
     icon?: string;
     color?: string;
     badge?: number;
@@ -12,57 +15,57 @@ interface MenuItem {
 
 /** 常用功能 */
 const commonMenus = ref<MenuItem[]>([
-    { name: "考勤打卡", color: "#4a90d9", badge: 0 },
-    { name: "流程审批", color: "#f5a623", badge: 3 },
-    { name: "我的任务", color: "#7ed321", badge: 5 },
-    { name: "日程管理", color: "#50c1e9", dot: true }
+    { nameKey: "workbench.attendance", color: "#4a90d9", badge: 0 },
+    { nameKey: "workbench.approval", color: "#f5a623", badge: 3 },
+    { nameKey: "workbench.my_tasks", color: "#7ed321", badge: 5 },
+    { nameKey: "workbench.schedule", color: "#50c1e9", dot: true }
 ]);
 
 /** 全部功能 */
-const allCategories = ref<Array<{ title: string; menus: MenuItem[] }>>([
+const allCategories = ref<Array<{ titleKey: string; menus: MenuItem[] }>>([
     {
-        title: "办公协作",
+        titleKey: "workbench.office_collaboration",
         menus: [
-            { name: "文档中心", color: "#4a90d9" },
-            { name: "视频会议", color: "#4a90d9" },
-            { name: "公告通知", color: "#f5a623", dot: true },
-            { name: "企业邮箱", color: "#4a90d9" },
-            { name: "工作报告", color: "#7ed321" },
-            { name: "文件共享", color: "#50c1e9" }
+            { nameKey: "workbench.doc_center", color: "#4a90d9" },
+            { nameKey: "workbench.video_meeting", color: "#4a90d9" },
+            { nameKey: "workbench.announcements", color: "#f5a623", dot: true },
+            { nameKey: "workbench.enterprise_email", color: "#4a90d9" },
+            { nameKey: "workbench.work_report", color: "#7ed321" },
+            { nameKey: "workbench.file_sharing", color: "#50c1e9" }
         ]
     },
     {
-        title: "人事管理",
+        titleKey: "workbench.hr_management",
         menus: [
-            { name: "请假申请", color: "#f5a623" },
-            { name: "报销申请", color: "#7ed321" },
-            { name: "薪资查询", color: "#e74c3c" },
-            { name: "培训中心", color: "#50c1e9" }
+            { nameKey: "workbench.leave_request", color: "#f5a623" },
+            { nameKey: "workbench.reimbursement", color: "#7ed321" },
+            { nameKey: "workbench.salary_query", color: "#e74c3c" },
+            { nameKey: "workbench.training_center", color: "#50c1e9" }
         ]
     },
     {
-        title: "行政管理",
+        titleKey: "workbench.admin_management",
         menus: [
-            { name: "访客预约", color: "#4a90d9" },
-            { name: "资产管理", color: "#f5a623" },
-            { name: "用车申请", color: "#7ed321" },
-            { name: "会议室预定", color: "#50c1e9" },
-            { name: "印章申请", color: "#e74c3c" },
-            { name: "证照管理", color: "#4a90d9" },
-            { name: "办公用品", color: "#f5a623" },
-            { name: "合同管理", color: "#7ed321" }
+            { nameKey: "workbench.visitor_booking", color: "#4a90d9" },
+            { nameKey: "workbench.asset_management", color: "#f5a623" },
+            { nameKey: "workbench.vehicle_request", color: "#7ed321" },
+            { nameKey: "workbench.meeting_room", color: "#50c1e9" },
+            { nameKey: "workbench.seal_request", color: "#e74c3c" },
+            { nameKey: "workbench.license_management", color: "#4a90d9" },
+            { nameKey: "workbench.office_supplies", color: "#f5a623" },
+            { nameKey: "workbench.contract_management", color: "#7ed321" }
         ]
     }
 ]);
 
 function onMenuClick(menu: MenuItem) {
-    uni.showToast({ title: menu.name, icon: "none" });
+    uni.showToast({ title: t(menu.nameKey), icon: "none" });
 }
 </script>
 
 <template>
     <view class="page">
-        <uni-nav-bar statusBar fixed title="工作台" />
+        <uni-nav-bar statusBar fixed :title="t('workbench.title')" />
 
         <!-- #ifdef APP -->
         <scroll-view class="scroll-body" scroll-y>
@@ -72,7 +75,7 @@ function onMenuClick(menu: MenuItem) {
             <view class="section-card">
                 <view class="section-header">
                     <view class="section-title-bar" />
-                    <text class="section-title">常用</text>
+                    <text class="section-title">{{ t("workbench.common") }}</text>
                 </view>
                 <view class="common-grid">
                     <view
@@ -83,7 +86,7 @@ function onMenuClick(menu: MenuItem) {
                         <view class="common-icon-box" :style="{ backgroundColor: menu.color + '18' }">
                             <image class="common-icon" :src="DEFAULT_FEATURE" mode="aspectFit" />
                         </view>
-                        <text class="common-name">{{ menu.name }}</text>
+                        <text class="common-name">{{ t(menu.nameKey) }}</text>
                         <view v-if="menu.badge" class="badge-num">{{ menu.badge > 99 ? '99+' : menu.badge }}</view>
                         <view v-if="menu.dot" class="badge-dot" />
                     </view>
@@ -94,7 +97,7 @@ function onMenuClick(menu: MenuItem) {
             <view v-for="(category, ci) in allCategories" :key="'cat' + ci" class="section-card">
                 <view class="section-header">
                     <view class="section-title-bar" />
-                    <text class="section-title">{{ category.title }}</text>
+                    <text class="section-title">{{ t(category.titleKey) }}</text>
                 </view>
                 <view class="menu-grid">
                     <view
@@ -105,7 +108,7 @@ function onMenuClick(menu: MenuItem) {
                         <view class="menu-icon-box" :style="{ backgroundColor: menu.color + '15' }">
                             <image class="menu-icon" :src="DEFAULT_FEATURE" mode="aspectFit" />
                         </view>
-                        <text class="menu-name">{{ menu.name }}</text>
+                        <text class="menu-name">{{ t(menu.nameKey) }}</text>
                         <view v-if="menu.dot" class="badge-dot-menu" />
                     </view>
                 </view>

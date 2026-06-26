@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { onError, onExit, onHide, onLaunch, onPageNotFound, onShow, onUnhandledRejection } from "@dcloudio/uni-app";
+import { useI18n } from "vue-i18n";
 import { DEV_MODE } from "@/config/env";
 import { setupErrorHandler, reportError } from "@/helper/error_handler";
 import { pushManager } from "@/helper/push_message";
 import { setupNetworkListener } from "@/hooks/useNetwork";
 import useAppStore from "@/stores/app";
+
+const { t } = useI18n();
 
 onLaunch(() => {
     console.log("App启动");
@@ -16,6 +19,12 @@ onLaunch(() => {
     setupNetworkListener();
 
     const appStore = useAppStore();
+
+    // 动态设置 tabBar 国际化文字
+    uni.setTabBarItem({ index: 0, text: t("tab.message") });
+    uni.setTabBarItem({ index: 1, text: t("tab.contacts") });
+    uni.setTabBarItem({ index: 2, text: t("tab.workbench") });
+    uni.setTabBarItem({ index: 3, text: t("tab.mine") });
 
     // 获取客户端推送ID
     uni.getPushClientId({

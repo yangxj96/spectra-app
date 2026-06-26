@@ -1,7 +1,8 @@
 {
     "app": {
         "name": "光谱",
-        "splash": "启动中"
+        "splash": "启动中",
+        "splash_title": "光谱App"
     },
     "tab": {
         "message": "消息",
@@ -11,20 +12,130 @@
     },
     "login": {
         "title": "欢迎登录",
+        "welcome_back": "欢迎回来",
+        "welcome_desc": "请输入账号信息登录系统",
         "username": "请输入用户名",
         "password": "请输入密码",
         "captcha": "验证码",
-        "submit": "登录",
+        "placeholder_username": "请输入用户名 / 手机号",
+        "placeholder_password": "请输入密码",
+        "placeholder_captcha": "请输入验证码",
+        "submit": "登 录",
         "submitting": "登录中...",
         "success": "登录成功",
+        "failed": "登录失败",
         "error_empty_username": "请输入用户名",
         "error_empty_password": "请输入密码",
-        "error_empty_captcha": "请输入验证码"
+        "error_empty_captcha": "请输入验证码",
+        "error_agree_protocol": "请先阅读并同意用户协议",
+        "captcha_refresh": "看不清？点击刷新",
+        "protocol_agree": "已阅读并同意",
+        "protocol_user": "《用户协议》",
+        "protocol_and": "和",
+        "protocol_privacy": "《隐私政策》",
+        "forgot_password": "忘记密码",
+        "register": "注册账号",
+        "brand_slogan": "高效协同 · 数字办公"
     },
     "common": {
         "loading": "加载中...",
         "network_error": "网络异常，请检查网络连接",
         "confirm": "确定",
-        "cancel": "取消"
+        "cancel": "取消",
+        "tip": "提示",
+        "got_it": "知道了",
+        "coming_soon": "\"{feature}\"功能正在开发中，敬请期待"
+    },
+    "message": {
+        "title": "消息",
+        "search_placeholder": "请输入搜索内容",
+        "push_id_current": "当前推送ID：{id}",
+        "push_id_failed": "未获取到推送ID，可能是获取失败或者尚未获取。"
+    },
+    "contacts": {
+        "title": "通讯录",
+        "search_placeholder": "请输入搜索内容",
+        "new_friends": "新的朋友",
+        "group_chat": "群聊",
+        "tags": "标签"
+    },
+    "workbench": {
+        "title": "工作台",
+        "common": "常用",
+        "attendance": "考勤打卡",
+        "approval": "流程审批",
+        "my_tasks": "我的任务",
+        "schedule": "日程管理",
+        "office_collaboration": "办公协作",
+        "doc_center": "文档中心",
+        "video_meeting": "视频会议",
+        "announcements": "公告通知",
+        "enterprise_email": "企业邮箱",
+        "work_report": "工作报告",
+        "file_sharing": "文件共享",
+        "hr_management": "人事管理",
+        "leave_request": "请假申请",
+        "reimbursement": "报销申请",
+        "salary_query": "薪资查询",
+        "training_center": "培训中心",
+        "admin_management": "行政管理",
+        "visitor_booking": "访客预约",
+        "asset_management": "资产管理",
+        "vehicle_request": "用车申请",
+        "meeting_room": "会议室预定",
+        "seal_request": "印章申请",
+        "license_management": "证照管理",
+        "office_supplies": "办公用品",
+        "contract_management": "合同管理"
+    },
+    "mine": {
+        "logout_confirm": "确定要退出登录吗？",
+        "logout_action": "退出",
+        "logout_success": "已退出登录",
+        "wechat_id": "微信号: {id}",
+        "status_label": "状态: {status}",
+        "status_none": "无",
+        "service": "服务",
+        "favorites": "收藏",
+        "settings": "设置",
+        "logout": "退出登录"
+    },
+    "chat": {
+        "input_placeholder": "请输入消息...",
+        "send": "发送"
+    },
+    "group": {
+        "title": "群聊"
+    },
+    "agreement": {
+        "user_title": "用户协议",
+        "privacy_title": "隐私政策",
+        "update_date": "更新日期：2026年1月1日",
+        "user_preamble": "欢迎使用光谱应用（以下简称\"本应用\"）。",
+        "user_s1_title": "一、总则",
+        "user_s1_content": "1.1 本协议是您与本应用之间关于使用本应用服务所订立的协议。\n\n1.2 请您在使用本应用服务前仔细阅读本协议。您使用本应用服务即表示您已充分阅读、理解并同意接受本协议的全部内容。\n\n1.3 本应用有权随时修改本协议的任何条款。修改后的协议一经发布即生效，并替代原协议。",
+        "user_s2_title": "二、账号注册与使用",
+        "user_s2_content": "2.1 您在注册账号时应提供真实、准确、完整的个人信息。\n\n2.2 您应妥善保管账号和密码，对以您账号进行的所有活动承担责任。\n\n2.3 未经本应用同意，您不得将账号转让、出借或出售给他人使用。",
+        "user_s3_title": "三、用户行为规范",
+        "user_s3_content": "3.1 您在使用本应用时应遵守中华人民共和国相关法律法规。\n\n3.2 您不得利用本应用从事违法活动，包括但不限于：\n发布、传播违法信息或不良信息；\n侵犯他人知识产权或其他合法权益；\n干扰本应用的正常运营；\n利用本应用进行商业广告宣传。\n\n3.3 如发现用户存在违规行为，本应用有权采取警告、限制功能、暂停或终止服务等措施。",
+        "user_s4_title": "四、服务变更与终止",
+        "user_s4_content": "4.1 本应用有权根据业务发展需要，变更、中断或终止部分或全部服务。\n\n4.2 如用户违反本协议规定，本应用有权终止向该用户提供服务。",
+        "user_s5_title": "五、免责声明",
+        "user_s5_content": "5.1 本应用不对因网络故障、系统维护、第三方原因等导致的暂时无法提供服务承担责任。\n\n5.2 本应用不对用户因使用本服务而产生的任何间接损失承担责任。",
+        "user_s6_title": "六、其他",
+        "user_s6_content": "6.1 本协议的解释、效力及争议解决，适用中华人民共和国法律。\n\n6.2 如本协议的任何条款被认定为无效，不影响其他条款的效力。",
+        "privacy_preamble": "光谱应用（以下简称\"我们\"）深知个人信息对您的重要性，我们将按法律法规要求，采取相应安全保护措施，尽力保护您的个人信息安全。",
+        "privacy_s1_title": "一、信息收集",
+        "privacy_s1_content": "1.1 我们会在您注册账号时收集您的用户名、手机号码等必要信息。\n\n1.2 为提供即时通讯服务，我们会收集您的消息内容、通讯录信息。\n\n1.3 为优化产品体验，我们会收集设备信息（设备型号、操作系统版本）、日志信息和使用行为数据。",
+        "privacy_s2_title": "二、信息使用",
+        "privacy_s2_content": "2.1 我们使用收集的信息用于提供、维护和改进我们的服务。\n\n2.2 我们可能使用您的信息向您推送与服务相关的通知。\n\n2.3 未经您事先同意，我们不会将您的个人信息提供给第三方，法律法规另有规定除外。",
+        "privacy_s3_title": "三、信息存储与保护",
+        "privacy_s3_content": "3.1 您的个人信息将存储在中华人民共和国境内。\n\n3.2 我们采用数据加密、访问控制等安全措施保护您的信息。\n\n3.3 我们仅在为实现服务目的所必需的时间内保留您的个人信息。",
+        "privacy_s4_title": "四、您的权利",
+        "privacy_s4_content": "4.1 您有权查阅、更正、删除您的个人信息。\n\n4.2 您有权撤回同意，撤回后不影响此前基于同意已进行的信息处理。\n\n4.3 您有权注销账号，注销后我们将删除您的个人信息。",
+        "privacy_s5_title": "五、未成年人保护",
+        "privacy_s5_content": "5.1 我们特别重视对未成年人个人信息的保护。\n\n5.2 未满14周岁的未成年人使用本服务前，应取得其监护人的同意。",
+        "privacy_s6_title": "六、政策更新",
+        "privacy_s6_content": "6.1 我们可能适时修订本隐私政策。\n\n6.2 修订后的政策将在本页面发布，重大变更将通过弹窗或其他显著方式通知您。\n\n6.3 如您对隐私政策有任何疑问，可通过应用内反馈渠道联系我们。"
     }
 }

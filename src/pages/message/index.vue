@@ -2,7 +2,10 @@
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import useAppStore from "@/stores/app";
 import type { MessageItem } from "@/types/index";
+import { useI18n } from "vue-i18n";
 import { onMounted, ref } from "vue";
+
+const { t } = useI18n();
 
 // #ifdef MP-WEIXIN
 useAuthGuard();
@@ -15,8 +18,8 @@ const notice = ref("");
 
 onMounted(() => {
     notice.value = appStore.push_id
-        ? `当前推送ID：${appStore.push_id}`
-        : "未获取到推送ID，可能是获取失败或者尚未获取。";
+        ? t("message.push_id_current", { id: appStore.push_id })
+        : t("message.push_id_failed");
 });
 
 // 消息列表
@@ -83,11 +86,11 @@ const handlerItemClick = (item: MessageItem) => {
 <template>
     <view class="page">
         <!-- 头部固定 -->
-        <uni-nav-bar statusBar fixed title="消息" />
+        <uni-nav-bar statusBar fixed :title="t('message.title')" />
         <!-- 公告 -->
         <uni-notice-bar single :text="notice" />
         <!-- 搜索） -->
-        <uni-search-bar :focus="false" placeholder="请输入搜索内容" />
+        <uni-search-bar :focus="false" :placeholder="t('message.search_placeholder')" />
         <!-- 列表区域（可滚动 + 下拉刷新） -->
         <scroll-view
             class="list-scroll"

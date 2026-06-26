@@ -1,133 +1,291 @@
 <script setup lang="ts">
+import { DEFAULT_AVATAR } from "@/config/default";
+import { useI18n } from "vue-i18n";
 import { ref } from "vue";
-import { useAuthGuard } from "@/hooks/useAuthGuard";
 
-// #ifdef MP-WEIXIN
-useAuthGuard();
-// #endif
+const { t } = useI18n();
 
-const list = ref([
+/** 功能列表 */
+const funcList = ref([
+    { icon: "👤", nameKey: "contacts.new_friends", badge: 3 },
+    { icon: "👥", nameKey: "contacts.group_chat" },
+    { icon: "🏷️", nameKey: "contacts.tags" }
+]);
+
+/** 联系人列表（按拼音首字母分组） */
+interface Contact {
+    name: string;
+    avatar: string;
+}
+
+const contactList = ref<Array<{ index: string; children: Contact[] }>>([
     {
         index: "A",
-        children: ["阿坝", "阿拉善", "阿里", "安康", "安庆", "鞍山", "安顺", "安阳", "澳门"]
+        children: [
+            { name: "阿里巴巴", avatar: DEFAULT_AVATAR },
+            { name: "艾琳", avatar: DEFAULT_AVATAR },
+            { name: "安德森", avatar: DEFAULT_AVATAR }
+        ]
     },
     {
         index: "B",
         children: [
-            "北京",
-            "白银",
-            "保定",
-            "宝鸡",
-            "保山",
-            "包头",
-            "巴中",
-            "北海",
-            "蚌埠",
-            "本溪",
-            "毕节",
-            "滨州",
-            "百色",
-            "亳州"
+            { name: "白展堂", avatar: DEFAULT_AVATAR },
+            { name: "班尼特", avatar: DEFAULT_AVATAR },
+            { name: "毕方", avatar: DEFAULT_AVATAR },
+            { name: "博尔特", avatar: DEFAULT_AVATAR }
         ]
     },
     {
         index: "C",
         children: [
-            "重庆",
-            "成都",
-            "长沙",
-            "长春",
-            "沧州",
-            "常德",
-            "昌都",
-            "长治",
-            "常州",
-            "巢湖",
-            "潮州",
-            "承德",
-            "郴州",
-            "赤峰",
-            "池州",
-            "崇左",
-            "楚雄",
-            "滁州",
-            "朝阳"
+            { name: "陈长生", avatar: DEFAULT_AVATAR },
+            { name: "程咬金", avatar: DEFAULT_AVATAR },
+            { name: "曹操", avatar: DEFAULT_AVATAR },
+            { name: "崔斯特", avatar: DEFAULT_AVATAR }
         ]
     },
     {
         index: "D",
         children: [
-            "大连",
-            "东莞",
-            "大理",
-            "丹东",
-            "大庆",
-            "大同",
-            "大兴安岭",
-            "德宏",
-            "德阳",
-            "德州",
-            "定西",
-            "迪庆",
-            "东营"
+            { name: "狄仁杰", avatar: DEFAULT_AVATAR },
+            { name: "董明珠", avatar: DEFAULT_AVATAR },
+            { name: "杜兰特", avatar: DEFAULT_AVATAR }
         ]
     },
     {
-        index: "E",
-        children: ["鄂尔多斯", "恩施", "鄂州"]
-    },
-    {
         index: "F",
-        children: ["福州", "防城港", "佛山", "抚顺", "抚州", "阜新", "阜阳"]
+        children: [
+            { name: "范闲", avatar: DEFAULT_AVATAR },
+            { name: "冯宝宝", avatar: DEFAULT_AVATAR },
+            { name: "傅红雪", avatar: DEFAULT_AVATAR }
+        ]
     },
     {
         index: "G",
-        children: ["广州", "桂林", "贵阳", "甘南", "赣州", "甘孜", "广安", "广元", "贵港", "果洛"]
+        children: [
+            { name: "郭靖", avatar: DEFAULT_AVATAR },
+            { name: "关羽", avatar: DEFAULT_AVATAR },
+            { name: "高渐离", avatar: DEFAULT_AVATAR }
+        ]
+    },
+    {
+        index: "H",
+        children: [
+            { name: "黄蓉", avatar: DEFAULT_AVATAR },
+            { name: "花木兰", avatar: DEFAULT_AVATAR },
+            { name: "韩信", avatar: DEFAULT_AVATAR },
+            { name: "胡八一", avatar: DEFAULT_AVATAR }
+        ]
     },
     {
         index: "J",
-        children: ["揭阳", "吉林", "晋江", "吉安", "胶州", "嘉兴", "济南", "鸡西", "荆州", "江门", "基隆"]
+        children: [
+            { name: "贾宝玉", avatar: DEFAULT_AVATAR },
+            { name: "姜子牙", avatar: DEFAULT_AVATAR },
+            { name: "金克丝", avatar: DEFAULT_AVATAR }
+        ]
     },
     {
-        index: "K",
-        children: ["昆明", "开封", "康定", "喀什"]
+        index: "L",
+        children: [
+            { name: "李白", avatar: DEFAULT_AVATAR },
+            { name: "刘备", avatar: DEFAULT_AVATAR },
+            { name: "鲁班七号", avatar: DEFAULT_AVATAR },
+            { name: "林黛玉", avatar: DEFAULT_AVATAR },
+            { name: "雷神", avatar: DEFAULT_AVATAR }
+        ]
+    },
+    {
+        index: "M",
+        children: [
+            { name: "马可波罗", avatar: DEFAULT_AVATAR },
+            { name: "芈月", avatar: DEFAULT_AVATAR },
+            { name: "莫甘娜", avatar: DEFAULT_AVATAR }
+        ]
+    },
+    {
+        index: "S",
+        children: [
+            { name: "孙悟空", avatar: DEFAULT_AVATAR },
+            { name: "宋江", avatar: DEFAULT_AVATAR },
+            { name: "司马懿", avatar: DEFAULT_AVATAR }
+        ]
+    },
+    {
+        index: "W",
+        children: [
+            { name: "王昭君", avatar: DEFAULT_AVATAR },
+            { name: "武则天", avatar: DEFAULT_AVATAR },
+            { name: "吴刚", avatar: DEFAULT_AVATAR }
+        ]
+    },
+    {
+        index: "X",
+        children: [
+            { name: "项羽", avatar: DEFAULT_AVATAR },
+            { name: "许仙", avatar: DEFAULT_AVATAR },
+            { name: "西门吹雪", avatar: DEFAULT_AVATAR }
+        ]
+    },
+    {
+        index: "Y",
+        children: [
+            { name: "杨过", avatar: DEFAULT_AVATAR },
+            { name: "嬴政", avatar: DEFAULT_AVATAR },
+            { name: "玉皇大帝", avatar: DEFAULT_AVATAR }
+        ]
+    },
+    {
+        index: "Z",
+        children: [
+            { name: "张三丰", avatar: DEFAULT_AVATAR },
+            { name: "赵云", avatar: DEFAULT_AVATAR },
+            { name: "诸葛亮", avatar: DEFAULT_AVATAR },
+            { name: "甄姬", avatar: DEFAULT_AVATAR }
+        ]
     }
 ]);
+
+function onFuncTap(item: { nameKey: string }) {
+    uni.showToast({ title: t(item.nameKey), icon: "none" });
+}
+
+function onContactTap(contact: Contact) {
+    uni.showToast({ title: contact.name, icon: "none" });
+}
 </script>
 
 <template>
-    <!-- 头部保留 -->
-    <uni-nav-bar statusBar fixed title="通讯录" />
+    <view class="page">
+        <uni-nav-bar statusBar fixed :title="t('contacts.title')" />
 
-    <view class="content-box">
-        <!-- 搜索栏 -->
-        <uni-search-bar placeholder="请输入搜索内容" />
+        <view class="content-box">
+            <!-- 搜索栏 -->
+            <uni-search-bar :placeholder="t('contacts.search_placeholder')" />
 
-        <!-- 联系人列表 -->
-        <t-indexes :sticky="false" :sticky-offset="120">
-            <block v-for="(item, index) in list" :key="index">
-                <t-indexes-anchor :index="item.index" />
-                <t-cell-group>
-                    <t-cell v-for="(city, index1) in item.children" :key="index1" :title="city" aria-role="button" />
-                </t-cell-group>
-            </block>
-        </t-indexes>
+            <!-- 功能列表 -->
+            <view class="func-list">
+                <view
+                    v-for="(item, i) in funcList"
+                    :key="'f' + i"
+                    class="func-item"
+                    @tap="onFuncTap(item)">
+                    <view class="func-icon-box">
+                        <text class="func-icon">{{ item.icon }}</text>
+                    </view>
+                    <text class="func-name">{{ t(item.nameKey) }}</text>
+                    <t-badge v-if="item.badge" :count="item.badge" :offset="[-8, 0]" />
+                </view>
+            </view>
+
+            <!-- 通讯录（按字母分组 + 右侧索引） -->
+            <t-indexes :sticky="true" :sticky-offset="120" class="indexes-wrap" :show-tips="false">
+                <block v-for="(group, gi) in contactList" :key="'g' + gi">
+                    <t-indexes-anchor :index="group.index" />
+                    <t-cell-group>
+                        <t-cell
+                            v-for="(contact, ci) in group.children"
+                            :key="'c' + ci"
+                            hover
+                            @click="onContactTap(contact)">
+                            <template #left-icon>
+                                <view class="contact-avatar-box">
+                                    <image class="contact-avatar" :src="contact.avatar" mode="aspectFill" />
+                                </view>
+                            </template>
+                            <template #title>
+                                <text class="contact-name">{{ contact.name }}</text>
+                            </template>
+                        </t-cell>
+                    </t-cell-group>
+                </block>
+            </t-indexes>
+        </view>
     </view>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .page {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    background: #f5f6f7;
 }
 
 .content-box {
-    /* 核心代码：*/
-    /* --window-top 是 uni-app 提供的 CSS 变量，*/
-    /* 它会自动等于「状态栏高度 + 原生导航栏高度」。*/
-    /* 这样就能完美避开 fixed 导航栏的遮挡，且兼容 H5、App 和小程序。*/
     padding-top: var(--window-top);
     flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+// =================================================
+// 功能列表
+// =================================================
+.func-list {
+    background: #fff;
+    padding: 12rpx 0;
+    display: flex;
+    gap: 0;
+}
+
+.func-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20rpx 0;
+    position: relative;
+}
+
+.func-icon-box {
+    width: 88rpx;
+    height: 88rpx;
+    border-radius: 20rpx;
+    background: #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10rpx;
+}
+
+.func-icon {
+    font-size: 40rpx;
+}
+
+.func-name {
+    font-size: 24rpx;
+    color: #333;
+}
+
+// =================================================
+// 通讯录
+// =================================================
+.indexes-wrap {
+    flex: 1;
+    padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+
+    // 隐藏中间字母提示框
+    :deep(.t-indexes__tips) {
+        display: none !important;
+    }
+}
+
+.contact-avatar-box {
+    width: 72rpx;
+    height: 72rpx;
+    margin-right: 20rpx;
+}
+
+.contact-avatar {
+    width: 72rpx;
+    height: 72rpx;
+    border-radius: 12rpx;
+}
+
+.contact-name {
+    font-size: 30rpx;
+    color: #333;
 }
 </style>

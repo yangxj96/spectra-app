@@ -6,7 +6,7 @@
         <view class="container">
             <view class="splash">
                 <image class="logo" src="/static/logo.png" />
-                <text class="title">光谱App</text>
+                <text class="title">{{ t("app.splash_title") }}</text>
             </view>
         </view>
 
@@ -19,8 +19,10 @@
 import { bootstrap } from "@/helper/bootstrap";
 import useAppStore from "@/stores/app";
 import { STORAGE_KEY_TOKEN } from "@/config/env";
+import { useI18n } from "vue-i18n";
 import { onMounted } from "vue";
 
+const { t } = useI18n();
 const appStore = useAppStore();
 
 onMounted(async () => {
