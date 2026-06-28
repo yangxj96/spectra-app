@@ -35,7 +35,7 @@ function handleLogout() {
 </script>
 
 <template>
-    <uni-nav-bar statusBar fixed title="" />
+    <uni-nav-bar status-bar fixed title="" />
 
     <view class="header-box">
         <uni-row>

@@ -11,6 +11,6 @@ const back = () => {
 <template>
     <view class="page">
         <!-- 头部固定 -->
-        <uni-nav-bar @clickLeft="back" showMenuButtonWidth statusBar left-icon="left" fixed :title="t('group.title')" />
+        <uni-nav-bar show-menu-button-width status-bar left-icon="left" fixed :title="t('group.title')" @click-left="back" />
     </view>
 </template>

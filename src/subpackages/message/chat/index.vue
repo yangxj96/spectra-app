@@ -88,7 +88,7 @@ scrollToBottom();
 <template>
     <view class="chat-page">
         <!-- 顶部导航 -->
-        <uni-nav-bar statusBar fixed :title="contactName" left-icon="left" @clickLeft="goBack" />
+        <uni-nav-bar status-bar fixed :title="contactName" left-icon="left" @click-left="goBack" />
 
         <!-- 消息列表 -->
         <scroll-view class="msg-scroll" scroll-y scroll-with-animation :scroll-into-view="scrollIntoView" :show-scrollbar="false" enhanced>
@@ -100,8 +100,8 @@ scrollToBottom();
 
                 <view
                     v-for="msg in messages"
-                    :key="msg.id"
                     :id="'msg-' + msg.id"
+                    :key="msg.id"
                     class="msg-row"
                     :class="msg.from === 'self' ? 'msg-self' : 'msg-other'">
                     <!-- 对方头像 -->
@@ -127,8 +127,8 @@ scrollToBottom();
         <!-- 底部输入栏 -->
         <view class="input-bar">
             <input
-                class="msg-input"
                 v-model="inputText"
+                class="msg-input"
                 :placeholder="t('chat.input_placeholder')"
                 placeholder-style="color: #bbb"
                 confirm-type="send"

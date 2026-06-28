@@ -86,7 +86,7 @@ const handlerItemClick = (item: MessageItem) => {
 <template>
     <view class="page">
         <!-- 头部固定 -->
-        <uni-nav-bar statusBar fixed :title="t('message.title')" />
+        <uni-nav-bar status-bar fixed :title="t('message.title')" />
         <!-- 公告 -->
         <uni-notice-bar single :text="notice" />
         <!-- 搜索） -->
@@ -100,14 +100,14 @@ const handlerItemClick = (item: MessageItem) => {
             @refresherrefresh="onListRefresh">
             <uni-list :border="true">
                 <uni-list-chat
-                    clickable
-                    @click="handlerItemClick(item)"
                     v-for="item in list"
                     :key="item.id"
+                    clickable
                     :title="item.title"
                     :note="item.note"
                     :badge-text="item.badge"
-                    :avatar="item.avatar" />
+                    :avatar="item.avatar"
+                    @click="handlerItemClick(item)" />
             </uni-list>
         </scroll-view>
     </view>

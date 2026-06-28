@@ -82,8 +82,7 @@ onUnhandledRejection(res => {
 onPageNotFound(res => {
     console.error("[onPageNotFound]", res.path);
     reportError({ type: "pageNotFound", message: res.path });
-    // 跳转到首页
-    uni.reLaunch({ url: "/pages/message/index" });
+    uni.reLaunch({ url: "/pages/error/not-found/index" });
 });
 </script>
 <style></style>

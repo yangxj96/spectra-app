@@ -46,6 +46,14 @@
         "got_it": "Got it",
         "coming_soon": "\"{feature}\" is under development, stay tuned"
     },
+    "error": {
+        "not_found": "Page Not Found",
+        "not_found_desc": "Sorry, the page you visited does not exist or has been removed",
+        "back_home": "Back to Home",
+        "network": "Network Error",
+        "network_desc": "Please check your network connection and try again",
+        "retry": "Retry"
+    },
     "message": {
         "title": "Messages",
         "search_placeholder": "Search",

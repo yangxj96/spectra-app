@@ -193,8 +193,8 @@ function showComingSoon(feature: string) {
                     <text class="icon-text">👤</text>
                 </view>
                 <input
-                    class="input-field"
                     v-model="form.username"
+                    class="input-field"
                     :placeholder="t('login.placeholder_username')"
                     placeholder-style="color: #bbb; font-size: 28rpx;" />
             </view>
@@ -205,8 +205,8 @@ function showComingSoon(feature: string) {
                     <text class="icon-text">🔒</text>
                 </view>
                 <input
-                    class="input-field"
                     v-model="form.password"
+                    class="input-field"
                     :password="!passwordVisible"
                     :placeholder="t('login.placeholder_password')"
                     placeholder-style="color: #bbb; font-size: 28rpx;" />
@@ -221,8 +221,8 @@ function showComingSoon(feature: string) {
                     <text class="icon-text">🛡️</text>
                 </view>
                 <input
-                    class="input-field"
                     v-model="form.captcha"
+                    class="input-field"
                     :placeholder="t('login.placeholder_captcha')"
                     placeholder-style="color: #bbb; font-size: 28rpx;"
                     maxlength="4" />

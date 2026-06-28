@@ -1,6 +1,6 @@
 import { API_BASE_URL, DEV_MODE, REQUEST_TIMEOUT, STORAGE_KEY_REFRESH_TOKEN, STORAGE_KEY_TOKEN } from "@/config/env";
 import type { ApiResponse, RequestMethod, RequestOptions } from "@/types";
-import { ApiError } from "@/types";
+import { ApiError } from "@/types/index";
 
 // =================================================
 // Token 管理

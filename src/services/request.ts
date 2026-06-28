@@ -1,7 +1,6 @@
 import { API_BASE_URL, REQUEST_TIMEOUT, STORAGE_KEY_TOKEN } from "@/config/env";
-import { ApiError } from "@/types";
+import { ApiError, type PageRequest, type PageResponse } from "@/types/index";
 import { request } from "./http";
-import type { PageRequest, PageResponse } from "@/types";
 
 // =================================================
 // 基础 HTTP 方法

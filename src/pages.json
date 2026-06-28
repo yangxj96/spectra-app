@@ -57,6 +57,18 @@
             "style": {
                 "navigationBarTitleText": "隐私政策"
             }
+        },
+        {
+            "path": "pages/error/not-found/index",
+            "style": {
+                "navigationBarTitleText": "页面未找到"
+            }
+        },
+        {
+            "path": "pages/error/network/index",
+            "style": {
+                "navigationBarTitleText": "网络异常"
+            }
         }
     ],
     // 分包

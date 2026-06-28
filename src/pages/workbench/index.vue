@@ -65,7 +65,7 @@ function onMenuClick(menu: MenuItem) {
 
 <template>
     <view class="page">
-        <uni-nav-bar statusBar fixed :title="t('workbench.title')" />
+        <uni-nav-bar status-bar fixed :title="t('workbench.title')" />
 
         <!-- #ifdef APP -->
         <scroll-view class="scroll-body" scroll-y>

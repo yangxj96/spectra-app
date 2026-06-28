@@ -46,6 +46,14 @@
         "got_it": "知道了",
         "coming_soon": "\"{feature}\"功能正在开发中，敬请期待"
     },
+    "error": {
+        "not_found": "页面未找到",
+        "not_found_desc": "抱歉，您访问的页面不存在或已被移除",
+        "back_home": "返回首页",
+        "network": "网络异常",
+        "network_desc": "请检查您的网络连接后重试",
+        "retry": "重试"
+    },
     "message": {
         "title": "消息",
         "search_placeholder": "请输入搜索内容",

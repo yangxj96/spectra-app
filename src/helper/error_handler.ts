@@ -25,8 +25,7 @@ export function setupErrorHandler() {
     // 3. 页面不存在
     uni.onPageNotFound(res => {
         console.error("[onPageNotFound]", res.path);
-        // 跳转到 404 页面或首页
-        uni.reLaunch({ url: "/pages/message/index" });
+        uni.reLaunch({ url: "/pages/error/not-found/index" });
     });
 
     if (DEV_MODE) {
