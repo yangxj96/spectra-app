@@ -13,6 +13,8 @@ useAuthGuard();
 
 // 刷新状态
 const refreshing = ref(false);
+// 加载状态
+const loading = ref(true);
 const appStore = useAppStore();
 const notice = ref("");
 
@@ -20,6 +22,11 @@ onMounted(() => {
     notice.value = appStore.push_id
         ? t("message.push_id_current", { id: appStore.push_id })
         : t("message.push_id_failed");
+
+    // 模拟加载
+    setTimeout(() => {
+        loading.value = false;
+    }, 1500);
 });
 
 // 消息列表
@@ -98,7 +105,18 @@ const handlerItemClick = (item: MessageItem) => {
             refresher-enabled
             :refresher-triggered="refreshing"
             @refresherrefresh="onListRefresh">
-            <uni-list :border="true">
+            <!-- 骨架屏 -->
+            <view v-if="loading" class="skeleton-list">
+                <view v-for="i in 5" :key="i" class="skeleton-item">
+                    <view class="skeleton-avatar">
+                        <t-skeleton :row-col="[[{ width: '90rpx', height: '90rpx' }]]" />
+                    </view>
+                    <view class="skeleton-content">
+                        <t-skeleton :row-col="[[{ width: '30%' }], [{ width: '55%' }]]" />
+                    </view>
+                </view>
+            </view>
+            <uni-list v-else :border="true">
                 <uni-list-chat
                     v-for="item in list"
                     :key="item.id"
@@ -123,5 +141,28 @@ const handlerItemClick = (item: MessageItem) => {
 /* 列表滚动区域 */
 .list-scroll {
     flex: 1;
+}
+
+.skeleton-list {
+    padding: 0;
+}
+
+.skeleton-item {
+    display: flex;
+    align-items: center;
+    height: 130rpx;
+    padding: 20rpx 30rpx;
+    box-sizing: border-box;
+}
+
+.skeleton-avatar {
+    flex-shrink: 0;
+    margin-right: 20rpx;
+}
+
+.skeleton-content {
+    flex: 1;
+    min-width: 0;
+    padding: 4rpx 0;
 }
 </style>
