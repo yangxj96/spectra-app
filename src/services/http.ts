@@ -107,13 +107,19 @@ async function refreshToken(): Promise<string> {
 
     return new Promise((resolve, reject) => {
         uni.request({
-            // TODO: 替换为实际刷新接口地址
-            url: API_BASE_URL + "/auth/refresh",
+            url: API_BASE_URL + "/api/auth/refresh",
             method: "POST",
             data: { refresh_token },
             header: { "Content-Type": "application/json" },
             timeout: REQUEST_TIMEOUT,
             success(res) {
+                const statusCode = res.statusCode;
+                if (statusCode !== 200) {
+                    clearToken();
+                    redirectToLogin();
+                    reject(new ApiError(statusCode, "刷新token失败"));
+                    return;
+                }
                 const result = res.data as ApiResponse<{ access_token: string; refresh_token: string }>;
                 if (result.code === 200) {
                     saveToken(result.data.access_token);
@@ -167,6 +173,7 @@ function redirectToLogin() {
 export function request<T = any>(options: RequestOptions): Promise<T> {
     const method = options.method ?? "GET";
     const skipAuth = options.skipAuth ?? false;
+    const noBody = options.noBody ?? false;
 
     // 构建完整 URL
     const url = buildUrl(API_BASE_URL + options.url, method, options.data);
@@ -191,9 +198,7 @@ export function request<T = any>(options: RequestOptions): Promise<T> {
 
                 const statusCode = res.statusCode;
 
-                // HTTP 状态码异常
                 if (statusCode !== 200) {
-                    // 401 未授权：尝试刷新 token 后重试
                     if (statusCode === 401 && !skipAuth) {
                         handleUnauthorized(options, resolve, reject);
                         return;
@@ -202,12 +207,17 @@ export function request<T = any>(options: RequestOptions): Promise<T> {
                     return;
                 }
 
+                // 无响应体模式：HTTP 200 即成功
+                if (noBody) {
+                    resolve(undefined as T);
+                    return;
+                }
+
                 // 解析业务响应 { code, data, msg }
                 const result = res.data as ApiResponse<T>;
                 if (result.code === 200) {
                     resolve(result.data);
                 } else {
-                    // 业务 code 401：尝试刷新 token
                     if (result.code === 401 && !skipAuth) {
                         handleUnauthorized(options, resolve, reject);
                         return;

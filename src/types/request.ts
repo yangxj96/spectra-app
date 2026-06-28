@@ -23,6 +23,8 @@ export interface RequestOptions {
     loadingText?: string;
     /** 是否跳过 token 注入，默认 false */
     skipAuth?: boolean;
+    /** 接口无响应体，仅通过 HTTP 状态码判断成功，默认 false */
+    noBody?: boolean;
 }
 
 /** 标准 API 响应结构 */

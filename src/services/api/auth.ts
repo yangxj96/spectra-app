@@ -30,7 +30,21 @@ export async function getCaptcha(): Promise<{ key: string; image: string }> {
 }
 
 /**
- * 密码登录
+ * 发送手机验证码（无响应体）
+ */
+export function sendSmsCode(phone: string): Promise<void> {
+    return request({ url: "/api/auth/sms", method: "POST", data: { phone }, skipAuth: true, noBody: true });
+}
+
+/**
+ * 发送邮箱验证码（无响应体）
+ */
+export function sendEmailCode(email: string): Promise<void> {
+    return request({ url: "/api/auth/email", method: "POST", data: { email }, skipAuth: true, noBody: true });
+}
+
+/**
+ * 登录
  */
 export function login(data: LoginRequest): Promise<LoginResponseData> {
     return request<LoginResponseData>({
@@ -42,7 +56,7 @@ export function login(data: LoginRequest): Promise<LoginResponseData> {
 }
 
 /**
- * 退出登录（无响应体，HTTP 200 即成功）
+ * 退出登录（无响应体，需携带 token 但不触发刷新）
  */
 export function logout(): Promise<void> {
     return new Promise((resolve, reject) => {

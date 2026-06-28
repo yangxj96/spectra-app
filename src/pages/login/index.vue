@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { DEV_MODE, STORAGE_KEY_TOKEN } from "@/config/env";
-import { getCaptcha, login } from "@/services/api/auth";
+import { DEV_MODE, STORAGE_KEY_REFRESH_TOKEN, STORAGE_KEY_TOKEN } from "@/config/env";
+import { getCaptcha, login, sendEmailCode, sendSmsCode } from "@/services/api/auth";
 import useAppStore from "@/stores/app";
-import type { LoginResponseData } from "@/types";
+import type { LoginResponseData, LoginType } from "@/types";
 import { onLoad } from "@dcloudio/uni-app";
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+
+const STORAGE_KEY_LOGIN_TYPE = "login_type";
+const STORAGE_KEY_AGREE_PROTOCOL = "agree_protocol";
 
 const { t } = useI18n();
 const appStore = useAppStore();
@@ -13,33 +16,63 @@ const appStore = useAppStore();
 /** 登录成功后跳转的目标路径 */
 const redirect = ref("");
 
+/** 登录类型 */
+const loginType = ref<LoginType>((uni.getStorageSync(STORAGE_KEY_LOGIN_TYPE) as LoginType) || "PASSWORD");
+
+/** 开发模式默认值 */
+const devUsername = loginType.value === "SMS" ? "13312344321" : "devops@devops00.com";
+
 /** 登录表单 */
 const form = ref({
-    username: DEV_MODE ? "devops@devops00.com" : "",
+    username: DEV_MODE ? devUsername : "",
     password: DEV_MODE ? "admin123" : "",
-    captcha: DEV_MODE ? "1" : ""
+    captcha: DEV_MODE ? "1" : "",
+    code: ""
 });
 
 /** 密码可见性 */
 const passwordVisible = ref(false);
 
 /** 同意协议 */
-const agreeProtocol = ref(false);
+const agreeProtocol = ref(uni.getStorageSync(STORAGE_KEY_AGREE_PROTOCOL) === "true");
 
 /** 登录按钮 loading 状态 */
 const isLoggingIn = ref(false);
 
-onLoad((options: any) => {
-    if (options.redirect) {
-        redirect.value = decodeURIComponent(options.redirect);
-    }
-});
+/** 倒计时 */
+const countdown = ref(0);
+let countdownTimer: ReturnType<typeof setInterval> | null = null;
 
 /** 验证码图片 */
 const captchaImage = ref("");
 
 /** 验证码 key */
 const captchaKey = ref("");
+
+/** 当前是否密码模式 */
+const isPasswordMode = computed(() => loginType.value === "PASSWORD");
+
+/** 倒计时文本 */
+const countdownText = computed(() => {
+    if (countdown.value > 0) return `${countdown.value}s`;
+    if (loginType.value === "SMS") return t("login.send_code");
+    if (loginType.value === "EMAIL") return t("login.send_code");
+    return "";
+});
+
+watch(loginType, val => {
+    uni.setStorageSync(STORAGE_KEY_LOGIN_TYPE, val);
+});
+
+watch(agreeProtocol, val => {
+    uni.setStorageSync(STORAGE_KEY_AGREE_PROTOCOL, String(val));
+});
+
+onLoad((options: any) => {
+    if (options.redirect) {
+        redirect.value = decodeURIComponent(options.redirect);
+    }
+});
 
 async function refreshCaptcha() {
     try {
@@ -57,18 +90,77 @@ function togglePassword() {
     passwordVisible.value = !passwordVisible.value;
 }
 
+function switchType(type: LoginType) {
+    loginType.value = type;
+    form.value.code = "";
+    if (DEV_MODE) {
+        form.value.username = type === "SMS" ? "13312344321" : "devops@devops00.com";
+    }
+}
+
+async function handleSendCode() {
+    const target = loginType.value === "SMS" ? form.value.username : form.value.username;
+    if (!target) {
+        uni.showToast({
+            title: t(loginType.value === "SMS" ? "login.error_empty_phone" : "login.error_empty_email"),
+            icon: "none"
+        });
+        return;
+    }
+    if (loginType.value === "SMS" && !/^1\d{10}$/.test(target)) {
+        uni.showToast({ title: t("login.error_invalid_phone"), icon: "none" });
+        return;
+    }
+    if (loginType.value === "EMAIL" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)) {
+        uni.showToast({ title: t("login.error_invalid_email"), icon: "none" });
+        return;
+    }
+
+    startCountdown();
+
+    try {
+        if (loginType.value === "SMS") {
+            await sendSmsCode(target);
+        } else {
+            await sendEmailCode(target);
+        }
+        uni.showToast({ title: t("login.code_sent"), icon: "success" });
+    } catch (err: any) {
+        uni.showToast({ title: err.msg || t("login.code_send_failed"), icon: "none" });
+    }
+}
+
+function startCountdown() {
+    countdown.value = 60;
+    if (countdownTimer) clearInterval(countdownTimer);
+    countdownTimer = setInterval(() => {
+        countdown.value--;
+        if (countdown.value <= 0) {
+            clearInterval(countdownTimer!);
+            countdownTimer = null;
+        }
+    }, 1000);
+}
+
 async function handleLogin() {
     if (!form.value.username) {
         uni.showToast({ title: t("login.error_empty_username"), icon: "none" });
         return;
     }
-    if (!form.value.password) {
-        uni.showToast({ title: t("login.error_empty_password"), icon: "none" });
-        return;
-    }
-    if (!form.value.captcha) {
-        uni.showToast({ title: t("login.error_empty_captcha"), icon: "none" });
-        return;
+    if (loginType.value === "PASSWORD") {
+        if (!form.value.password) {
+            uni.showToast({ title: t("login.error_empty_password"), icon: "none" });
+            return;
+        }
+        if (!form.value.captcha) {
+            uni.showToast({ title: t("login.error_empty_captcha"), icon: "none" });
+            return;
+        }
+    } else {
+        if (!form.value.code) {
+            uni.showToast({ title: t("login.error_empty_code"), icon: "none" });
+            return;
+        }
     }
     if (!agreeProtocol.value) {
         uni.showToast({ title: t("login.error_agree_protocol"), icon: "none" });
@@ -79,13 +171,28 @@ async function handleLogin() {
     isLoggingIn.value = true;
 
     try {
-        const result = await login({
-            type: "PASSWORD",
-            username: form.value.username,
-            password: form.value.password,
-            captcha: form.value.captcha,
-            captchaKey: captchaKey.value
-        });
+        let result: LoginResponseData;
+        if (loginType.value === "PASSWORD") {
+            result = await login({
+                type: "PASSWORD",
+                username: form.value.username,
+                password: form.value.password,
+                captcha: form.value.captcha,
+                captchaKey: captchaKey.value
+            });
+        } else if (loginType.value === "SMS") {
+            result = await login({
+                type: "SMS",
+                username: form.value.username,
+                sms_code: form.value.code
+            });
+        } else {
+            result = await login({
+                type: "EMAIL",
+                username: form.value.username,
+                email_code: form.value.code
+            });
+        }
         handleLoginSuccess(result);
     } catch (err: any) {
         uni.showToast({ title: err.msg || t("login.failed"), icon: "none" });
@@ -96,6 +203,7 @@ async function handleLogin() {
 
 function handleLoginSuccess(result: LoginResponseData) {
     uni.setStorageSync(STORAGE_KEY_TOKEN, result.access_token);
+    uni.setStorageSync(STORAGE_KEY_REFRESH_TOKEN, result.refresh_token);
     appStore.setToken(result.access_token);
     appStore.setUser({ id: result.id, username: result.username });
 
@@ -117,7 +225,6 @@ function handleLoginSuccess(result: LoginResponseData) {
 }
 
 function goAgreement(type: "user" | "privacy") {
-    // 登录中不允许跳转，防止与登录按钮事件冲突
     if (isLoggingIn.value) return;
     const url = type === "user" ? "/pages/agreement/user/index" : "/pages/agreement/privacy/index";
     uni.navigateTo({ url });
@@ -152,49 +259,91 @@ function showComingSoon(feature: string) {
                 <text class="form-desc">{{ t("login.welcome_desc") }}</text>
             </view>
 
-            <!-- 用户名 -->
+            <!-- 登录方式切换 -->
+            <view class="type-tabs">
+                <view class="type-tab" :class="{ active: loginType === 'PASSWORD' }" @tap="switchType('PASSWORD')">
+                    <text>{{ t("login.type_password") }}</text>
+                </view>
+                <view class="type-tab" :class="{ active: loginType === 'SMS' }" @tap="switchType('SMS')">
+                    <text>{{ t("login.type_sms") }}</text>
+                </view>
+                <view class="type-tab" :class="{ active: loginType === 'EMAIL' }" @tap="switchType('EMAIL')">
+                    <text>{{ t("login.type_email") }}</text>
+                </view>
+            </view>
+
+            <!-- 账号输入 -->
             <view class="input-group">
                 <view class="input-icon">
-                    <text class="icon-text">👤</text>
+                    <text class="icon-text">{{ loginType === "SMS" ? "📱" : "👤" }}</text>
                 </view>
                 <input
                     v-model="form.username"
                     class="input-field"
-                    :placeholder="t('login.placeholder_username')"
+                    :placeholder="
+                        loginType === 'SMS'
+                            ? t('login.placeholder_phone')
+                            : loginType === 'EMAIL'
+                              ? t('login.placeholder_email')
+                              : t('login.placeholder_username')
+                    "
                     placeholder-style="color: #bbb; font-size: 28rpx;" />
             </view>
 
-            <!-- 密码 -->
-            <view class="input-group">
-                <view class="input-icon">
-                    <text class="icon-text">🔒</text>
+            <!-- 密码模式 -->
+            <template v-if="isPasswordMode">
+                <view class="input-group">
+                    <view class="input-icon">
+                        <text class="icon-text">🔒</text>
+                    </view>
+                    <input
+                        v-model="form.password"
+                        class="input-field"
+                        :password="!passwordVisible"
+                        :placeholder="t('login.placeholder_password')"
+                        placeholder-style="color: #bbb; font-size: 28rpx;" />
+                    <view class="input-suffix" @click="togglePassword">
+                        <text>{{ passwordVisible ? "🙈" : "👁️" }}</text>
+                    </view>
                 </view>
-                <input
-                    v-model="form.password"
-                    class="input-field"
-                    :password="!passwordVisible"
-                    :placeholder="t('login.placeholder_password')"
-                    placeholder-style="color: #bbb; font-size: 28rpx;" />
-                <view class="input-suffix" @click="togglePassword">
-                    <text>{{ passwordVisible ? "🙈" : "👁️" }}</text>
-                </view>
-            </view>
 
-            <!-- 验证码 -->
-            <view class="input-group">
-                <view class="input-icon">
-                    <text class="icon-text">🛡️</text>
+                <view class="input-group">
+                    <view class="input-icon">
+                        <text class="icon-text">🛡️</text>
+                    </view>
+                    <input
+                        v-model="form.captcha"
+                        class="input-field"
+                        :placeholder="t('login.placeholder_captcha')"
+                        placeholder-style="color: #bbb; font-size: 28rpx;"
+                        maxlength="4" />
+                    <view class="captcha-img-wrap" @tap.stop="refreshCaptcha">
+                        <image v-if="captchaImage" class="captcha-img" :src="captchaImage" mode="aspectFit" />
+                    </view>
                 </view>
-                <input
-                    v-model="form.captcha"
-                    class="input-field"
-                    :placeholder="t('login.placeholder_captcha')"
-                    placeholder-style="color: #bbb; font-size: 28rpx;"
-                    maxlength="4" />
-                <view class="captcha-img-wrap" @tap.stop="refreshCaptcha">
-                    <image v-if="captchaImage" class="captcha-img" :src="captchaImage" mode="aspectFit" />
+            </template>
+
+            <!-- 验证码模式 -->
+            <template v-else>
+                <view class="input-group">
+                    <view class="input-icon">
+                        <text class="icon-text">🔑</text>
+                    </view>
+                    <input
+                        v-model="form.code"
+                        class="input-field"
+                        :placeholder="t('login.placeholder_code')"
+                        placeholder-style="color: #bbb; font-size: 28rpx;"
+                        maxlength="6"
+                        type="number" />
+                    <view
+                        class="code-btn"
+                        :class="{ disabled: countdown > 0 }"
+                        @tap="countdown > 0 ? undefined : handleSendCode()">
+                        <text>{{ countdownText }}</text>
+                    </view>
                 </view>
-            </view>
+            </template>
 
             <!-- 协议勾选 -->
             <view class="protocol-row">
@@ -301,7 +450,7 @@ function showComingSoon(feature: string) {
 }
 
 .form-header {
-    margin-bottom: 48rpx;
+    margin-bottom: 40rpx;
 }
 
 .form-title {
@@ -315,6 +464,34 @@ function showComingSoon(feature: string) {
 .form-desc {
     font-size: 26rpx;
     color: #999;
+}
+
+// =================================================
+// 登录方式切换
+// =================================================
+.type-tabs {
+    display: flex;
+    gap: 16rpx;
+    margin-bottom: 36rpx;
+}
+
+.type-tab {
+    flex: 1;
+    height: 72rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16rpx;
+    background: #f5f7fa;
+    font-size: 26rpx;
+    color: #666;
+    transition: all 0.2s;
+
+    &.active {
+        background: #1a6eff;
+        color: #fff;
+        font-weight: 600;
+    }
 }
 
 // =================================================
@@ -387,6 +564,28 @@ function showComingSoon(feature: string) {
 .captcha-img {
     width: 100%;
     height: 100%;
+}
+
+// =================================================
+// 发送验证码按钮
+// =================================================
+.code-btn {
+    flex-shrink: 0;
+    margin-left: 16rpx;
+    padding: 0 24rpx;
+    height: 64rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12rpx;
+    background: #1a6eff;
+    font-size: 24rpx;
+    color: #fff;
+    white-space: nowrap;
+
+    &.disabled {
+        background: #c0c4cc;
+    }
 }
 
 // =================================================
