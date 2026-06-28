@@ -5,9 +5,9 @@
 /** 用户信息 */
 export interface UserInfo {
     /** 用户 ID */
-    id: number;
+    id: string;
     /** 用户名 */
-    name: string;
+    username: string;
     /** 头像 URL */
     avatar?: string;
     /** 手机号 */
@@ -18,14 +18,25 @@ export interface UserInfo {
 
 /** 登录请求参数 */
 export interface LoginRequest {
+    type: "PASSWORD";
     username: string;
     password: string;
     captcha: string;
+    captchaKey?: string;
+}
+
+/** 登录响应 data */
+export interface LoginResponseData {
+    id: string;
+    username: string;
+    access_token: string;
+    authorities: string[];
+    roles: string[];
 }
 
 /** 登录响应 */
 export interface LoginResponse {
-    token: string;
-    refresh_token: string;
-    user: UserInfo;
+    code: number;
+    msg: string;
+    data: LoginResponseData;
 }

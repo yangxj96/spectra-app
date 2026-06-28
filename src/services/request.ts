@@ -62,7 +62,7 @@ export function upload<T = any>(options: UploadOptions): Promise<T> {
             success(res) {
                 try {
                     const result = JSON.parse(res.data);
-                    if (result.code === 0) {
+                    if (result.code === 200) {
                         resolve(result.data as T);
                     } else {
                         reject(new ApiError(result.code, result.msg));

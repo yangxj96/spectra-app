@@ -20,11 +20,11 @@ onLaunch(() => {
 
     const appStore = useAppStore();
 
-    // 动态设置 tabBar 国际化文字
-    uni.setTabBarItem({ index: 0, text: t("tab.message") });
-    uni.setTabBarItem({ index: 1, text: t("tab.contacts") });
-    uni.setTabBarItem({ index: 2, text: t("tab.workbench") });
-    uni.setTabBarItem({ index: 3, text: t("tab.mine") });
+    // 动态设置 tabBar 国际化文字（非 tabBar 页启动时会失败，忽略）
+    const tabTexts = [t("tab.message"), t("tab.contacts"), t("tab.workbench"), t("tab.mine")];
+    tabTexts.forEach((text, index) => {
+        uni.setTabBarItem({ index, text }).catch(() => {});
+    });
 
     // 获取客户端推送ID
     uni.getPushClientId({

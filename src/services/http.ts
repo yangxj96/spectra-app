@@ -114,11 +114,11 @@ async function refreshToken(): Promise<string> {
             header: { "Content-Type": "application/json" },
             timeout: REQUEST_TIMEOUT,
             success(res) {
-                const result = res.data as ApiResponse<{ token: string; refresh_token: string }>;
-                if (result.code === 0) {
-                    saveToken(result.data.token);
+                const result = res.data as ApiResponse<{ access_token: string; refresh_token: string }>;
+                if (result.code === 200) {
+                    saveToken(result.data.access_token);
                     saveRefreshToken(result.data.refresh_token);
-                    resolve(result.data.token);
+                    resolve(result.data.access_token);
                 } else {
                     clearToken();
                     redirectToLogin();
@@ -204,7 +204,7 @@ export function request<T = any>(options: RequestOptions): Promise<T> {
 
                 // 解析业务响应 { code, data, msg }
                 const result = res.data as ApiResponse<T>;
-                if (result.code === 0) {
+                if (result.code === 200) {
                     resolve(result.data);
                 } else {
                     // 业务 code 401：尝试刷新 token
@@ -221,9 +221,7 @@ export function request<T = any>(options: RequestOptions): Promise<T> {
                     uni.hideLoading();
                 }
 
-                reject(
-                    new ApiError(-1, err.errMsg || "网络异常，请检查网络连接")
-                );
+                reject(new ApiError(-1, err.errMsg || "网络异常，请检查网络连接"));
             }
         });
     });

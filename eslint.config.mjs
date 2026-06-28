@@ -46,7 +46,7 @@ export default tseslint.config(
             "@typescript-eslint/no-explicit-any": "warn",
             "@typescript-eslint/no-empty-function": "warn",
             "@typescript-eslint/no-non-null-assertion": "warn",
-            "no-console": ["warn", { allow: ["warn", "error"] }],
+            "no-console": "off",
             "no-debugger": "warn",
             "no-duplicate-imports": "error",
             "prefer-const": "error",

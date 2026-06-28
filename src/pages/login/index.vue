@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { DEV_MODE, STORAGE_KEY_TOKEN } from "@/config/env";
+import { getCaptcha, login } from "@/services/api/auth";
+import useAppStore from "@/stores/app";
+import type { LoginResponseData } from "@/types";
 import { onLoad } from "@dcloudio/uni-app";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { DEV_MODE, STORAGE_KEY_REFRESH_TOKEN, STORAGE_KEY_TOKEN } from "@/config/env";
-import { post } from "@/services/request";
-import useAppStore from "@/stores/app";
-import type { LoginResponse } from "@/types";
 
 const { t } = useI18n();
 const appStore = useAppStore();
@@ -15,9 +15,9 @@ const redirect = ref("");
 
 /** 登录表单 */
 const form = ref({
-    username: "",
-    password: "",
-    captcha: ""
+    username: DEV_MODE ? "devops@devops00.com" : "",
+    password: DEV_MODE ? "admin123" : "",
+    captcha: DEV_MODE ? "1" : ""
 });
 
 /** 密码可见性 */
@@ -35,48 +35,20 @@ onLoad((options: any) => {
     }
 });
 
-/** 验证码字符串 */
-const captchaCode = ref("");
+/** 验证码图片 */
+const captchaImage = ref("");
 
-/** 每个验证码字符的样式 */
-const charStyles = ref<Array<{ rotate: string; offsetY: string; fontSize: string; color: string }>>([]);
+/** 验证码 key */
+const captchaKey = ref("");
 
-/** 验证码干扰线 */
-const noiseLines = ref<Array<{ left: string; top: string; width: string; rotate: string; opacity: number }>>([]);
-
-/** 噪点位置 */
-const noiseDots = ref<Array<{ left: string; top: string; opacity: number }>>([]);
-
-const COLORS = ["#e74c3c", "#2e71cc", "#3498db", "#e67e22"];
-
-function generateCode(): string {
-    return Math.random().toString(36).slice(2, 6).toUpperCase();
-}
-
-function randomStyle() {
-    charStyles.value = Array.from({ length: 4 }, (_, i) => ({
-        rotate: `${(i - 1.5) * 14 + (Math.random() * 14 - 7)}deg`,
-        offsetY: `${Math.random() * 8 - 4}rpx`,
-        fontSize: `${Math.random() * 12 + 36}rpx`,
-        color: COLORS[i]
-    }));
-    noiseLines.value = Array.from({ length: 6 }, () => ({
-        left: `${Math.random() * 88}%`,
-        top: `${Math.random() * 78}%`,
-        width: `${Math.random() * 60 + 20}rpx`,
-        rotate: `${Math.random() * 50 - 25}deg`,
-        opacity: Math.random() * 0.25 + 0.08
-    }));
-    noiseDots.value = Array.from({ length: 20 }, () => ({
-        left: `${Math.random() * 93}%`,
-        top: `${Math.random() * 88}%`,
-        opacity: Math.random() * 0.15 + 0.03
-    }));
-}
-
-function refreshCaptcha() {
-    captchaCode.value = generateCode();
-    randomStyle();
+async function refreshCaptcha() {
+    try {
+        const result = await getCaptcha();
+        captchaImage.value = result.image;
+        captchaKey.value = result.key;
+    } catch (_e) {
+        uni.showToast({ title: t("login.captcha_load_failed"), icon: "none" });
+    }
 }
 
 refreshCaptcha();
@@ -107,24 +79,14 @@ async function handleLogin() {
     isLoggingIn.value = true;
 
     try {
-        if (DEV_MODE) {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const mockResult: LoginResponse = {
-                token: "dev_token_" + Date.now(),
-                refresh_token: "dev_refresh_" + Date.now(),
-                user: { id: 1, name: form.value.username || "Jack" }
-            };
-            handleLoginSuccess(mockResult);
-            return;
-        }
-
-        // TODO: 替换为实际登录接口
-        // const result = await post<LoginResponse>("/auth/login", {
-        //     username: form.value.username,
-        //     password: form.value.password,
-        //     captcha: form.value.captcha
-        // });
-        // handleLoginSuccess(result);
+        const result = await login({
+            type: "PASSWORD",
+            username: form.value.username,
+            password: form.value.password,
+            captcha: form.value.captcha,
+            captchaKey: captchaKey.value
+        });
+        handleLoginSuccess(result);
     } catch (err: any) {
         uni.showToast({ title: err.msg || t("login.failed"), icon: "none" });
     } finally {
@@ -132,18 +94,21 @@ async function handleLogin() {
     }
 }
 
-function handleLoginSuccess(result: LoginResponse) {
-    uni.setStorageSync(STORAGE_KEY_TOKEN, result.token);
-    uni.setStorageSync(STORAGE_KEY_REFRESH_TOKEN, result.refresh_token);
-    appStore.setToken(result.token);
-    appStore.setUser(result.user);
+function handleLoginSuccess(result: LoginResponseData) {
+    uni.setStorageSync(STORAGE_KEY_TOKEN, result.access_token);
+    appStore.setToken(result.access_token);
+    appStore.setUser({ id: result.id, username: result.username });
 
     uni.showToast({ title: t("login.success"), icon: "success" });
 
     setTimeout(() => {
         const target = redirect.value || "/pages/message/index";
-        // tab 页必须用 switchTab，其他页用 reLaunch
-        if (target.startsWith("/pages/message") || target.startsWith("/pages/contacts") || target.startsWith("/pages/workbench") || target.startsWith("/pages/mine")) {
+        if (
+            target.startsWith("/pages/message") ||
+            target.startsWith("/pages/contacts") ||
+            target.startsWith("/pages/workbench") ||
+            target.startsWith("/pages/mine")
+        ) {
             uni.switchTab({ url: target });
         } else {
             uni.reLaunch({ url: target });
@@ -226,47 +191,8 @@ function showComingSoon(feature: string) {
                     :placeholder="t('login.placeholder_captcha')"
                     placeholder-style="color: #bbb; font-size: 28rpx;"
                     maxlength="4" />
-            </view>
-
-            <!-- 图形验证码 -->
-            <view class="captcha-box" @tap="refreshCaptcha">
-                <view class="captcha-canvas">
-                    <view
-                        v-for="(line, i) in noiseLines"
-                        :key="'l' + i"
-                        class="noise-line"
-                        :style="{
-                            left: line.left,
-                            top: line.top,
-                            width: line.width,
-                            transform: `rotate(${line.rotate})`,
-                            opacity: line.opacity
-                        }" />
-                    <view class="captcha-chars">
-                        <text
-                            v-for="(char, i) in captchaCode.split('')"
-                            :key="'c' + i"
-                            class="captcha-char"
-                            :style="{
-                                transform: `rotate(${charStyles[i]?.rotate ?? '0deg'}) translateY(${charStyles[i]?.offsetY ?? '0rpx'})`,
-                                fontSize: charStyles[i]?.fontSize ?? '36rpx',
-                                color: charStyles[i]?.color ?? '#333'
-                            }">
-                            {{ char }}
-                        </text>
-                    </view>
-                    <view class="noise-dots">
-                        <text
-                            v-for="(dot, i) in noiseDots"
-                            :key="'d' + i"
-                            class="noise-dot"
-                            :style="{ left: dot.left, top: dot.top, opacity: dot.opacity }">
-                            ·
-                        </text>
-                    </view>
-                </view>
-                <view class="captcha-tip-row">
-                    <text class="captcha-tip-text">{{ t("login.captcha_refresh") }}</text>
+                <view class="captcha-img-wrap" @tap.stop="refreshCaptcha">
+                    <image v-if="captchaImage" class="captcha-img" :src="captchaImage" mode="aspectFit" />
                 </view>
             </view>
 
@@ -292,9 +218,13 @@ function showComingSoon(feature: string) {
 
             <!-- 底部链接 -->
             <view class="form-footer">
-                <view class="footer-link" @tap.stop="showComingSoon(t('login.forgot_password'))"><text>{{ t("login.forgot_password") }}</text></view>
+                <view class="footer-link" @tap.stop="showComingSoon(t('login.forgot_password'))">
+                    <text>{{ t("login.forgot_password") }}</text>
+                </view>
                 <text class="footer-divider">|</text>
-                <view class="footer-link" @tap.stop="showComingSoon(t('login.register'))"><text>{{ t("login.register") }}</text></view>
+                <view class="footer-link" @tap.stop="showComingSoon(t('login.register'))">
+                    <text>{{ t("login.register") }}</text>
+                </view>
             </view>
         </view>
 
@@ -441,67 +371,22 @@ function showComingSoon(feature: string) {
 // =================================================
 // 图形验证码
 // =================================================
-.captcha-box {
-    margin-bottom: 24rpx;
-}
-
-.captcha-canvas {
-    position: relative;
-    width: 100%;
-    height: 100rpx;
-    background: #f5f6f8;
-    border-radius: 16rpx;
-    border: 2rpx solid #e0e3e8;
+.captcha-img-wrap {
+    width: 180rpx;
+    height: 60rpx;
+    flex-shrink: 0;
+    margin-left: 16rpx;
+    border-radius: 12rpx;
     overflow: hidden;
+    background: #f5f6f8;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.noise-line {
-    position: absolute;
-    height: 2rpx;
-    background: #c0c4cc;
-    pointer-events: none;
-}
-
-.captcha-chars {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    gap: 12rpx;
-    pointer-events: none;
-}
-
-.captcha-char {
-    font-weight: 700;
-    font-family: "Courier New", monospace;
-    text-shadow: 1rpx 1rpx 0 rgba(0, 0, 0, 0.1);
-    user-select: none;
-}
-
-.noise-dots {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-}
-
-.noise-dot {
-    position: absolute;
-    font-size: 24rpx;
-    color: #999;
-    font-weight: bold;
-}
-
-.captcha-tip-row {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 10rpx;
-}
-
-.captcha-tip-text {
-    font-size: 22rpx;
-    color: #1a6eff;
+.captcha-img {
+    width: 100%;
+    height: 100%;
 }
 
 // =================================================

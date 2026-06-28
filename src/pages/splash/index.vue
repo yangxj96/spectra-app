@@ -17,13 +17,11 @@
 
 <script setup lang="ts">
 import { bootstrap } from "@/helper/bootstrap";
-import useAppStore from "@/stores/app";
 import { STORAGE_KEY_TOKEN } from "@/config/env";
 import { useI18n } from "vue-i18n";
 import { onMounted } from "vue";
 
 const { t } = useI18n();
-const appStore = useAppStore();
 
 onMounted(async () => {
     await bootstrap();
@@ -33,18 +31,12 @@ onMounted(async () => {
 });
 
 function next() {
-    if (appStore.isFirstLaunch) {
-        uni.switchTab({ url: "/pages/message/index" });
-        return;
-    }
-
     const token = uni.getStorageSync(STORAGE_KEY_TOKEN);
-    if (!token) {
+    if (token) {
+        uni.switchTab({ url: "/pages/message/index" });
+    } else {
         uni.reLaunch({ url: "/pages/login/index" });
-        return;
     }
-
-    uni.switchTab({ url: "/pages/message/index" });
 }
 </script>
 

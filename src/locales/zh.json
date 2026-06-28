@@ -29,6 +29,7 @@
         "error_empty_captcha": "请输入验证码",
         "error_agree_protocol": "请先阅读并同意用户协议",
         "captcha_refresh": "看不清？点击刷新",
+        "captcha_load_failed": "验证码加载失败",
         "protocol_agree": "已阅读并同意",
         "protocol_user": "《用户协议》",
         "protocol_and": "和",

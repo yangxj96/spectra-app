@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { DEFAULT_AVATAR } from "@/config/default";
+import { logout } from "@/services/api/auth";
 import useAppStore from "@/stores/app";
 import { useI18n } from "vue-i18n";
 import { ref } from "vue";
@@ -15,22 +16,32 @@ const handleAvatarError = () => {
 };
 
 /** 退出登录 */
-function handleLogout() {
-    uni.showModal({
-        title: t("common.tip"),
-        content: t("mine.logout_confirm"),
-        confirmText: t("mine.logout_action"),
-        cancelText: t("common.cancel"),
-        success(res) {
-            if (res.confirm) {
-                appStore.clearAuth();
-                uni.showToast({ title: t("mine.logout_success"), icon: "success" });
-                setTimeout(() => {
-                    uni.reLaunch({ url: "/pages/login/index" });
-                }, 500);
+async function handleLogout() {
+    const confirmed = await new Promise<boolean>(resolve => {
+        uni.showModal({
+            title: t("common.tip"),
+            content: t("mine.logout_confirm"),
+            confirmText: t("mine.logout_action"),
+            cancelText: t("common.cancel"),
+            success(res) {
+                resolve(!!res.confirm);
             }
-        }
+        });
     });
+
+    if (!confirmed) return;
+
+    try {
+        await logout();
+    } catch (_e) {
+        // 即使服务端请求失败也继续清理本地状态
+    }
+
+    appStore.clearAuth();
+    uni.showToast({ title: t("mine.logout_success"), icon: "success" });
+    setTimeout(() => {
+        uni.reLaunch({ url: "/pages/splash/index" });
+    }, 500);
 }
 </script>
 
@@ -50,7 +61,9 @@ function handleLogout() {
                     <text style="font-size: 32rpx; color: #666">{{ t("mine.wechat_id", { id: "xxxxxxx" }) }}</text>
                 </uni-row>
                 <uni-row style="margin-top: 20rpx">
-                    <text style="font-size: 32rpx; color: #666">{{ t("mine.status_label", { status: t("mine.status_none") }) }}</text>
+                    <text style="font-size: 32rpx; color: #666">
+                        {{ t("mine.status_label", { status: t("mine.status_none") }) }}
+                    </text>
                 </uni-row>
             </uni-col>
         </uni-row>
@@ -94,7 +107,7 @@ function handleLogout() {
             <t-cell-group>
                 <t-cell hover @click="handleLogout">
                     <template #title>
-                        <text style="color: #e74c3c; text-align: center; width: 100%;">{{ t("mine.logout") }}</text>
+                        <text style="color: #e74c3c; text-align: center; width: 100%">{{ t("mine.logout") }}</text>
                     </template>
                 </t-cell>
             </t-cell-group>

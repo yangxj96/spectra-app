@@ -29,6 +29,7 @@
         "error_empty_captcha": "Please enter captcha",
         "error_agree_protocol": "Please read and agree to the user agreement",
         "captcha_refresh": "Can't read clearly? Click to refresh",
+        "captcha_load_failed": "Failed to load captcha",
         "protocol_agree": "I have read and agree to",
         "protocol_user": "User Agreement",
         "protocol_and": "and",
