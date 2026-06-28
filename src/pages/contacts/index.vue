@@ -158,7 +158,7 @@ function onContactTap(contact: Contact) {
 
 <template>
     <view class="page">
-        <uni-nav-bar statusBar fixed :title="t('contacts.title')" />
+        <uni-nav-bar status-bar fixed :title="t('contacts.title')" />
 
         <view class="content-box">
             <!-- 搜索栏 -->
@@ -166,11 +166,7 @@ function onContactTap(contact: Contact) {
 
             <!-- 功能列表 -->
             <view class="func-list">
-                <view
-                    v-for="(item, i) in funcList"
-                    :key="'f' + i"
-                    class="func-item"
-                    @tap="onFuncTap(item)">
+                <view v-for="(item, i) in funcList" :key="'f' + i" class="func-item" @tap="onFuncTap(item)">
                     <view class="func-icon-box">
                         <text class="func-icon">{{ item.icon }}</text>
                     </view>
