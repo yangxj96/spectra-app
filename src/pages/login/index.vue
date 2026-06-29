@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { DEV_MODE, STORAGE_KEY_REFRESH_TOKEN, STORAGE_KEY_TOKEN } from "@/config/env";
-import { getCaptcha, login, sendEmailCode, sendSmsCode } from "@/services/api/auth";
+import { login } from "@/services/api/auth";
+import { getCaptcha, sendEmailCode, sendSmsCode } from "@/services/api/captcha";
 import useAppStore from "@/stores/app";
 import type { LoginResponseData, LoginType } from "@/types";
 import { onLoad } from "@dcloudio/uni-app";

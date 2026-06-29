@@ -1,47 +1,6 @@
-import { API_BASE_URL, STORAGE_KEY_TOKEN } from "@/config/env";
+import { API_BASE_URL, STORAGE_KEY_REFRESH_TOKEN, STORAGE_KEY_TOKEN } from "@/config/env";
 import type { LoginRequest, LoginResponseData } from "@/types";
 import { request } from "../http";
-
-/**
- * 获取图形验证码
- * 返回 { key, image }，key 需随登录请求一同提交
- */
-export async function getCaptcha(): Promise<{ key: string; image: string }> {
-    return new Promise((resolve, reject) => {
-        uni.request({
-            url: API_BASE_URL + "/api/common/kaptcha",
-            method: "GET",
-            responseType: "arraybuffer",
-            success(res) {
-                if (res.statusCode !== 200) {
-                    reject(new Error(`获取验证码失败(${res.statusCode})`));
-                    return;
-                }
-                const key = (res.header && (res.header["captcha-key"] || res.header["Captcha-Key"])) || "";
-                const base64 = uni.arrayBufferToBase64(res.data as ArrayBuffer);
-                const image = `data:image/png;base64,${base64}`;
-                resolve({ key, image });
-            },
-            fail(err) {
-                reject(new Error(err.errMsg || "获取验证码失败"));
-            }
-        });
-    });
-}
-
-/**
- * 发送手机验证码（无响应体）
- */
-export function sendSmsCode(phone: string): Promise<void> {
-    return request({ url: "/api/auth/sms", method: "POST", data: { phone }, skipAuth: true, noBody: true });
-}
-
-/**
- * 发送邮箱验证码（无响应体）
- */
-export function sendEmailCode(email: string): Promise<void> {
-    return request({ url: "/api/auth/email", method: "POST", data: { email }, skipAuth: true, noBody: true });
-}
 
 /**
  * 登录
@@ -61,13 +20,16 @@ export function login(data: LoginRequest): Promise<LoginResponseData> {
 export function logout(): Promise<void> {
     return new Promise((resolve, reject) => {
         const token = uni.getStorageSync(STORAGE_KEY_TOKEN) as string | null;
+        const refreshToken = uni.getStorageSync(STORAGE_KEY_REFRESH_TOKEN) as string | null;
         uni.request({
             url: API_BASE_URL + "/api/auth/logout",
             method: "POST",
             header: {
                 "Content-Type": "application/json",
+                "Api-Version": "1.0.0",
                 ...(token ? { Authorization: `Bearer ${token}` } : {})
             },
+            data: { refreshToken },
             success(res) {
                 if (res.statusCode === 200) {
                     resolve();

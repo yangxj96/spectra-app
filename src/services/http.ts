@@ -46,6 +46,7 @@ function buildHeader(custom?: Record<string, string>, skipAuth?: boolean): Recor
     const header: Record<string, string> = { ...custom };
 
     header["Content-Type"] = header["Content-Type"] ?? "application/json";
+    header["Api-Version"] = "1.0.0";
 
     if (!skipAuth) {
         const token = getToken();
@@ -110,7 +111,7 @@ async function refreshToken(): Promise<string> {
             url: API_BASE_URL + "/api/auth/refresh",
             method: "POST",
             data: { refresh_token },
-            header: { "Content-Type": "application/json" },
+            header: { "Content-Type": "application/json", "Api-Version": "1.0.0" },
             timeout: REQUEST_TIMEOUT,
             success(res) {
                 const statusCode = res.statusCode;
