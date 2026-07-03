@@ -1,6 +1,14 @@
 # Spectra App
 
-跨平台企业协作应用基础模板，基于 uni-app (Vue 3 + TypeScript)。
+Spectra 系统的 **移动端前端**，基于 uni-app (Vue 3 + TypeScript) 构建，支持 H5 和微信小程序。
+
+| 项目                                                       | 说明                                |
+| ---------------------------------------------------------- | ----------------------------------- |
+| [spectra-admin](https://github.com/yangxj96/spectra-admin) | 后端 API（Spring Boot 4 + Java 25） |
+| [spectra-ui](https://github.com/yangxj96/spectra-ui)       | Web 管理端（Vue 3 + Element Plus）  |
+| **spectra-app**（本仓库）                                  | 移动端（uni-app，H5 / 微信小程序）  |
+
+本项目通过 `VITE_API_BASE_URL` 连接 `spectra-admin` 作为 API 后端（开发环境默认 `https://127.0.0.1:4004`）。
 
 ## 技术栈
 
@@ -51,18 +59,18 @@ pnpm build:mp-weixin
 
 ## 开发命令
 
-| 命令 | 说明 |
-|---|---|
-| `pnpm start` | 启动 H5 开发服务器 |
-| `pnpm dev:h5` | 启动 H5 开发服务器 |
-| `pnpm dev:mp-weixin` | 启动微信小程序开发 |
-| `pnpm build:h5` | 构建 H5 生产版本 |
+| 命令                   | 说明                   |
+| ---------------------- | ---------------------- |
+| `pnpm start`           | 启动 H5 开发服务器     |
+| `pnpm dev:h5`          | 启动 H5 开发服务器     |
+| `pnpm dev:mp-weixin`   | 启动微信小程序开发     |
+| `pnpm build:h5`        | 构建 H5 生产版本       |
 | `pnpm build:mp-weixin` | 构建微信小程序生产版本 |
-| `pnpm type-check` | TypeScript 类型检查 |
-| `pnpm lint` | ESLint 代码检查 |
-| `pnpm lint:fix` | ESLint 自动修复 |
-| `pnpm format` | Prettier 格式化代码 |
-| `pnpm format:check` | 检查代码格式 |
+| `pnpm type-check`      | TypeScript 类型检查    |
+| `pnpm lint`            | ESLint 代码检查        |
+| `pnpm lint:fix`        | ESLint 自动修复        |
+| `pnpm format`          | Prettier 格式化代码    |
+| `pnpm format:check`    | 检查代码格式           |
 
 ## 项目结构
 
@@ -108,11 +116,11 @@ src/
 
 在项目根目录创建 `.env` 文件（参考 `.env.example`）：
 
-| 变量 | 说明 | 默认值 |
-|---|---|---|
+| 变量                | 说明         | 默认值                    |
+| ------------------- | ------------ | ------------------------- |
 | `VITE_API_BASE_URL` | API 基础地址 | `https://api.example.com` |
-| `VITE_DEV_MODE` | 开发模式开关 | `false` |
-| `VITE_APP_TITLE` | 应用标题 | `光谱` |
+| `VITE_DEV_MODE`     | 开发模式开关 | `false`                   |
+| `VITE_APP_TITLE`    | 应用标题     | `光谱`                    |
 
 ## 内置功能
 
