@@ -4,7 +4,7 @@ import App from "./App.vue";
 import i18n from "@/locales";
 
 import "@/static/iconfont/iconfont.css";
-import "@tdesign/uniapp/theme.less";
+import "@/styles/tdesign-light.less";
 
 // 注册拦截器
 import "@/interceptor";
