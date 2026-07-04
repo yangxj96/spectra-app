@@ -1,6 +1,7 @@
-import { API_BASE_URL, STORAGE_KEY_REFRESH_TOKEN, STORAGE_KEY_TOKEN } from "@/config/env";
+import { STORAGE_KEY_REFRESH_TOKEN, STORAGE_KEY_TOKEN } from "@/config/env";
 import useAppStore from "@/stores/app";
 import type { LoginResponseData } from "@/types";
+import { request } from "@/services/http";
 
 export async function initUser() {
     const appStore = useAppStore();
@@ -12,24 +13,11 @@ export async function initUser() {
     }
 
     try {
-        const result = await new Promise<LoginResponseData>((resolve, reject) => {
-            uni.request({
-                url: API_BASE_URL + "/api/auth/refresh",
-                method: "POST",
-                data: { refresh_token: refreshToken },
-                header: { "Content-Type": "application/json" },
-                success(res) {
-                    const body = res.data as { code: number; msg: string; data: LoginResponseData };
-                    if (res.statusCode === 200 && body.code === 200) {
-                        resolve(body.data);
-                    } else {
-                        reject(new Error(body.msg || "token无效"));
-                    }
-                },
-                fail(err) {
-                    reject(new Error(err.errMsg || "网络异常"));
-                }
-            });
+        const result = await request<LoginResponseData>({
+            url: "/api/auth/refresh",
+            method: "POST",
+            data: { refresh_token: refreshToken },
+            skipAuth: true
         });
 
         uni.setStorageSync(STORAGE_KEY_TOKEN, result.access_token);
