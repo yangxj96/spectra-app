@@ -26,3 +26,12 @@ export const STORAGE_KEY_REFRESH_TOKEN = "refresh_token";
 
 /** 用户信息在本地存储中的 key */
 export const STORAGE_KEY_USER = "user_info";
+
+/** 是否启用请求加解密 */
+export const CRYPTO_ENABLED = import.meta.env.VITE_CRYPTO_ENABLED === "true";
+
+/** RSA 公钥（用于加密请求 / 验证响应签名） */
+export const RSA_PUBLIC_KEY = import.meta.env.VITE_RSA_PUBLIC_KEY as string;
+
+/** RSA 私钥（用于解密响应） */
+export const RSA_PRIVATE_KEY = import.meta.env.VITE_RSA_PRIVATE_KEY as string;

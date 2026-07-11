@@ -1,6 +1,18 @@
-import { API_BASE_URL, DEV_MODE, REQUEST_TIMEOUT, STORAGE_KEY_REFRESH_TOKEN, STORAGE_KEY_TOKEN } from "@/config/env";
+import {
+    API_BASE_URL,
+    CRYPTO_ENABLED,
+    DEV_MODE,
+    REQUEST_TIMEOUT,
+    RSA_PRIVATE_KEY,
+    RSA_PUBLIC_KEY,
+    STORAGE_KEY_REFRESH_TOKEN,
+    STORAGE_KEY_TOKEN
+} from "@/config/env";
 import type { ApiResponse, RequestMethod, RequestOptions } from "@/types";
 import { ApiError } from "@/types/index";
+// #ifdef H5
+import { decrypt, encrypt, generateIv, sign, verifySignature } from "@/utils/crypto/crypto-utils";
+// #endif
 
 // =================================================
 // Token 管理
@@ -157,6 +169,51 @@ function redirectToLogin() {
 }
 
 // =================================================
+// 请求加解密（仅 H5 平台可用）
+// =================================================
+
+// #ifdef H5
+type EncryptedBody = {
+    data: string;
+    key: string;
+    iv: string;
+    nonce: string;
+    timestamp: number;
+    signature: string;
+};
+
+/**
+ * 加密请求体
+ */
+async function encryptRequest(bodyStr: string): Promise<EncryptedBody> {
+    const iv = generateIv();
+    const timestamp = Date.now();
+    const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
+
+    const { encryptedData, encryptedKey } = await encrypt(bodyStr, iv, RSA_PUBLIC_KEY);
+
+    const signContent = `data=${encryptedData}&nonce=${nonce}&timestamp=${timestamp}`;
+    const signature = await sign(signContent, RSA_PRIVATE_KEY);
+
+    return { data: encryptedData, key: encryptedKey, iv, nonce, timestamp, signature };
+}
+
+/**
+ * 解密响应体
+ */
+async function decryptResponse(encryptedBody: EncryptedBody): Promise<any> {
+    const signData = `data=${encryptedBody.data}&nonce=${encryptedBody.nonce}&timestamp=${encryptedBody.timestamp}`;
+    const isValid = await verifySignature(encryptedBody.signature, signData, RSA_PUBLIC_KEY);
+    if (!isValid) {
+        throw new Error("签名验证失败，数据可能被篡改");
+    }
+
+    const json = await decrypt(encryptedBody.key, encryptedBody.data, encryptedBody.iv, RSA_PRIVATE_KEY);
+    return JSON.parse(json) as unknown;
+}
+// #endif
+
+// =================================================
 // 核心请求方法
 // =================================================
 
@@ -171,13 +228,25 @@ function redirectToLogin() {
  * 5. code === 0 返回 data，否则抛 ApiError
  * 6. 401 时自动刷新 token 并重试一次
  */
-export function request<T = any>(options: RequestOptions): Promise<T> {
+export async function request<T = any>(options: RequestOptions): Promise<T> {
     const method = options.method ?? "GET";
     const skipAuth = options.skipAuth ?? false;
     const noBody = options.noBody ?? false;
 
-    // 构建完整 URL
-    const url = buildUrl(API_BASE_URL + options.url, method, options.data);
+    // 加密请求体
+    let requestData: any = options.data;
+    let requestHeader: Record<string, string> | undefined = options.header;
+
+    // #ifdef H5
+    if (CRYPTO_ENABLED && method !== "GET" && options.data) {
+        const bodyStr = JSON.stringify(options.data);
+        requestData = await encryptRequest(bodyStr);
+        requestHeader = { ...requestHeader, "X-Encrypted": "1" };
+    }
+    // #endif
+
+    // 构建完整 URL（GET 时 data 用于 query params）
+    const url = buildUrl(API_BASE_URL + options.url, method, method === "GET" ? options.data : undefined);
 
     // 显示 loading
     if (options.showLoading) {
@@ -188,11 +257,11 @@ export function request<T = any>(options: RequestOptions): Promise<T> {
         uni.request({
             url,
             method: method as any,
-            data: method !== "GET" ? options.data : undefined,
-            header: buildHeader(options.header, skipAuth),
+            data: method !== "GET" ? requestData : undefined,
+            header: buildHeader(requestHeader, skipAuth),
             timeout: options.timeout ?? REQUEST_TIMEOUT,
 
-            success(res) {
+            async success(res) {
                 if (options.showLoading) {
                     uni.hideLoading();
                 }
@@ -216,6 +285,25 @@ export function request<T = any>(options: RequestOptions): Promise<T> {
 
                 // 解析业务响应 { code, data, msg }
                 const result = res.data as ApiResponse<T>;
+
+                // 解密响应体
+                // #ifdef H5
+                if (
+                    CRYPTO_ENABLED &&
+                    result.data &&
+                    typeof result.data === "object" &&
+                    "signature" in (result.data as Record<string, unknown>)
+                ) {
+                    try {
+                        const encrypted = result.data as unknown as EncryptedBody;
+                        (result as any).data = await decryptResponse(encrypted);
+                    } catch (e: any) {
+                        reject(new ApiError(-1, e.message || "响应解密失败"));
+                        return;
+                    }
+                }
+                // #endif
+
                 if (result.code === 200) {
                     resolve(result.data);
                 } else {
