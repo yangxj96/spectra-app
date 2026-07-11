@@ -1,62 +1,62 @@
 # AGENTS.md
 
-## Project Overview
+## 项目概述
 
-This is the **mobile frontend** for `spectra-admin` — a uni-app (Vue 3) project for cross-platform development (H5/WeChat Mini Program). Uses TypeScript, Vite, and pnpm.
+`spectra-admin` 的**移动端前端**——基于 uni-app（Vue 3）的跨平台项目（H5/微信小程序）。使用 TypeScript、Vite 和 pnpm。
 
-- Backend API: `spectra-admin` (Spring Boot, port 4004)
-- All API calls go to `VITE_API_BASE_URL` (defaults to `https://127.0.0.1:4004` in development)
+- 后端 API：`spectra-admin`（Spring Boot，端口 4004）
+- 所有 API 调用指向 `VITE_API_BASE_URL`（开发环境默认 `https://127.0.0.1:4004`）
 
-## Development Commands
+## 开发命令
 
 ```bash
-# Start development (H5)
-pnpm start           # or: pnpm dev:h5
+# 启动开发（H5）
+pnpm start           # 或: pnpm dev:h5
 
-# WeChat Mini Program dev
+# 微信小程序开发
 pnpm dev:mp-weixin
 
-# Build for production
+# 生产构建
 pnpm build:h5
 pnpm build:mp-weixin
 
-# Type checking (runs before start)
+# 类型检查（启动前执行）
 pnpm type-check      # vue-tsc --noEmit
 
-# Lint code
+# 代码检查
 pnpm lint            # eslint .
 pnpm lint:fix        # eslint . --fix
 
-# Format code
+# 代码格式化
 pnpm format          # prettier --write .
 pnpm format:check    # prettier --check .
 ```
 
-## Code Style
+## 代码规范
 
-- **Formatter**: Prettier with 4-space indentation, double quotes, 120 char width
-- **No trailing commas**, semicolons required
-- **End of line**: LF
+- **格式化工具**：Prettier，4 空格缩进，双引号，120 字符行宽
+- **无尾逗号**，必须分号
+- **换行符**：LF
 
-## Project Structure
+## 项目结构
 
-- `src/pages/` - Page components (main package)
-- `src/subpackages/` - Sub-packages (split load for mini programs)
-- `src/platform/` - **Platform abstraction layer** (see below)
-- `src/stores/` - Pinia stores
-- `src/services/` - API services
-- `src/config/` - Configuration
-- `src/utils/` - Utilities
-- `src/locales/` - i18n translations
-- `src/hooks/` - Vue composables
+- `src/pages/` - 页面组件（主包）
+- `src/subpackages/` - 分包（小程序分包加载）
+- `src/platform/` - **平台抽象层**（详见下方）
+- `src/stores/` - Pinia 状态管理
+- `src/services/` - API 服务
+- `src/config/` - 配置
+- `src/utils/` - 工具函数
+- `src/locales/` - i18n 多语言
+- `src/hooks/` - Vue 组合式函数
 
-## Key Technologies
+## 核心技术
 
-- **Framework**: uni-app (cross-platform Vue 3)
-- **UI Library**: TDesign (`@tdesign/uniapp`)
-- **State**: Pinia
-- **i18n**: vue-i18n
-- **CSS**: SCSS + Less
+- **框架**：uni-app（跨平台 Vue 3）
+- **UI 库**：TDesign（`@tdesign/uniapp`）
+- **状态管理**：Pinia
+- **国际化**：vue-i18n
+- **CSS**：SCSS + Less
 
 ## Platform Abstraction (`src/platform/`)
 
@@ -100,9 +100,9 @@ plus.android.requestPermissions(["android.permission.CAMERA"]);
 | APP 需要 `scroll-view` 包裹而 H5 不需要 | 模板内直接用 `<!-- #ifdef APP -->` 即可                 |
 | 微信小程序特有的组件/逻辑               | 模板内用 `<!-- #ifdef MP-WEIXIN -->` 或放入 `platform/` |
 
-## Notes
+## 备注
 
-- Path alias: `@/` → `src/`
-- Node 24.14.0, pnpm 11.0.9 (via mise)
-- Build outputs to `unpackage/`
-- API endpoints and response formats are defined by `spectra-admin` — if the backend changes an endpoint, update the corresponding `src/services/` module here.
+- 路径别名：`@/` → `src/`
+- Node 24.14.0, pnpm 11.0.9（通过 mise）
+- 构建输出到 `unpackage/`
+- API 端点和响应格式由 `spectra-admin` 定义——若后端更改端点，需同步更新此处的 `src/services/` 模块。
