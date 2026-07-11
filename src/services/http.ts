@@ -187,7 +187,7 @@ type EncryptedBody = {
  */
 async function encryptRequest(bodyStr: string): Promise<EncryptedBody> {
     const iv = generateIv();
-    const timestamp = Date.now();
+    const timestamp = Math.floor(Date.now() / 1000);
     const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
 
     const { encryptedData, encryptedKey } = await encrypt(bodyStr, iv, RSA_PUBLIC_KEY);
