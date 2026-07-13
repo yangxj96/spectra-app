@@ -3,8 +3,6 @@ import {
     CRYPTO_ENABLED,
     DEV_MODE,
     REQUEST_TIMEOUT,
-    RSA_PRIVATE_KEY,
-    RSA_PUBLIC_KEY,
     STORAGE_KEY_REFRESH_TOKEN,
     STORAGE_KEY_TOKEN
 } from "@/config/env";
@@ -12,6 +10,71 @@ import type { ApiResponse, RequestMethod, RequestOptions } from "@/types";
 import { ApiError } from "@/types/index";
 // #ifdef H5
 import { decrypt, encrypt, generateIv, sign, verifySignature } from "@/utils/crypto/crypto-utils";
+// #endif
+
+// =================================================
+// 加解密配置（从后端动态获取）
+// =================================================
+
+// #ifdef H5
+let cryptoEnabled = false;
+let serverPublicKey: string | null = null;
+let clientPrivateKey: string | null = null;
+
+/**
+ * 初始化加解密配置（H5 平台）
+ * 应用启动时调用，从后端获取加解密开关和服务端公钥
+ */
+export async function initCrypto(): Promise<void> {
+    if (!CRYPTO_ENABLED) return;
+    try {
+        const res = await new Promise<any>((resolve, reject) => {
+            uni.request({
+                url: API_BASE_URL + "/api/system/crypto/config",
+                method: "GET",
+                timeout: 10000,
+                success: r => resolve(r),
+                fail: e => reject(e)
+            });
+        });
+        if (res.statusCode === 200 && res.data?.code === 200) {
+            cryptoEnabled = res.data.data.enabled;
+            serverPublicKey = res.data.data.serverPublicKey;
+            console.log(`[Crypto] 初始化完成: enabled=${cryptoEnabled}`);
+        }
+    } catch (e) {
+        console.warn("[Crypto] 初始化失败，加解密已禁用:", e);
+        cryptoEnabled = false;
+    }
+}
+
+/**
+ * 获取客户端私钥（H5 平台）
+ * 登录后调用，用于解密响应的 AES 密钥
+ */
+export async function fetchClientPrivateKey(): Promise<void> {
+    if (!cryptoEnabled) return;
+    try {
+        const token = uni.getStorageSync(STORAGE_KEY_TOKEN) as string | null;
+        if (!token) return;
+        const res = await new Promise<any>((resolve, reject) => {
+            uni.request({
+                url: API_BASE_URL + "/api/system/crypto/keypair/client-private",
+                method: "GET",
+                header: { Authorization: `Bearer ${token}` },
+                timeout: 10000,
+                success: r => resolve(r),
+                fail: e => reject(e)
+            });
+        });
+        if (res.statusCode === 200 && res.data?.code === 200 && res.data.data?.privateKey) {
+            clientPrivateKey = res.data.data.privateKey;
+            console.log("[Crypto] 客户端私钥已获取");
+        }
+    } catch (e) {
+        console.warn("[Crypto] 获取客户端私钥失败:", e);
+    }
+}
 // #endif
 
 // =================================================
@@ -94,21 +157,11 @@ function buildUrl(url: string, method?: RequestMethod, data?: Record<string, any
  * 处理业务错误
  */
 function handleBusinessError(code: number, msg: string): never {
-    // TODO: 根据业务错误码做分类处理
-    // 例如：code === 401 时触发 token 刷新或跳转登录
-    // 例如：code === 403 时提示权限不足
-    // 例如：code === 10001 时特定业务提示
     throw new ApiError(code, msg);
 }
 
 /**
  * 刷新 token
- *
- * 步骤:
- * 1. 从本地存储读取 refresh_token
- * 2. 调用 POST /auth/refresh 接口换取新 token
- * 3. 刷新成功：保存新 token，通知等待队列
- * 4. 刷新失败：清除本地 token，跳转登录页
  */
 async function refreshToken(): Promise<string> {
     const refresh_token = getRefreshToken();
@@ -157,7 +210,6 @@ async function refreshToken(): Promise<string> {
  * 跳转到登录页
  */
 function redirectToLogin() {
-    // 获取当前页面路径作为 redirect 参数
     const pages = getCurrentPages();
     const current = pages[pages.length - 1];
     const route = current ? "/" + current.route : "";
@@ -186,14 +238,18 @@ type EncryptedBody = {
  * 加密请求体
  */
 async function encryptRequest(bodyStr: string): Promise<EncryptedBody> {
+    if (!serverPublicKey) {
+        throw new Error("服务端公钥未就绪，无法加密请求");
+    }
+
     const iv = generateIv();
     const timestamp = Math.floor(Date.now() / 1000);
     const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
 
-    const { encryptedData, encryptedKey } = await encrypt(bodyStr, iv, RSA_PUBLIC_KEY);
+    const { encryptedData, encryptedKey } = await encrypt(bodyStr, iv, serverPublicKey);
 
     const signContent = `data=${encryptedData}&nonce=${nonce}&timestamp=${timestamp}`;
-    const signature = await sign(signContent, RSA_PRIVATE_KEY);
+    const signature = await sign(signContent, clientPrivateKey!);
 
     return { data: encryptedData, key: encryptedKey, iv, nonce, timestamp, signature };
 }
@@ -202,13 +258,17 @@ async function encryptRequest(bodyStr: string): Promise<EncryptedBody> {
  * 解密响应体
  */
 async function decryptResponse(encryptedBody: EncryptedBody): Promise<any> {
+    if (!serverPublicKey || !clientPrivateKey) {
+        throw new Error("密钥未就绪，无法解密响应");
+    }
+
     const signData = `data=${encryptedBody.data}&nonce=${encryptedBody.nonce}&timestamp=${encryptedBody.timestamp}`;
-    const isValid = await verifySignature(encryptedBody.signature, signData, RSA_PUBLIC_KEY);
+    const isValid = await verifySignature(encryptedBody.signature, signData, serverPublicKey);
     if (!isValid) {
         throw new Error("签名验证失败，数据可能被篡改");
     }
 
-    const json = await decrypt(encryptedBody.key, encryptedBody.data, encryptedBody.iv, RSA_PRIVATE_KEY);
+    const json = await decrypt(encryptedBody.key, encryptedBody.data, encryptedBody.iv, clientPrivateKey);
     return JSON.parse(json) as unknown;
 }
 // #endif
@@ -219,14 +279,6 @@ async function decryptResponse(encryptedBody: EncryptedBody): Promise<any> {
 
 /**
  * 发起 HTTP 请求
- *
- * 处理流程:
- * 1. 构建请求 URL（GET 请求拼接 query params）
- * 2. 构建请求头（注入 token）
- * 3. 发送请求（可选 loading）
- * 4. 解析响应的 { code, data, msg } 结构
- * 5. code === 0 返回 data，否则抛 ApiError
- * 6. 401 时自动刷新 token 并重试一次
  */
 export async function request<T = any>(options: RequestOptions): Promise<T> {
     const method = options.method ?? "GET";
@@ -238,7 +290,7 @@ export async function request<T = any>(options: RequestOptions): Promise<T> {
     let requestHeader: Record<string, string> | undefined = options.header;
 
     // #ifdef H5
-    if (CRYPTO_ENABLED && method !== "GET" && options.data) {
+    if (cryptoEnabled && method !== "GET" && options.data) {
         const bodyStr = JSON.stringify(options.data);
         requestData = await encryptRequest(bodyStr);
         requestHeader = { ...requestHeader, "X-Encrypted": "1" };
@@ -289,7 +341,8 @@ export async function request<T = any>(options: RequestOptions): Promise<T> {
                 // 解密响应体
                 // #ifdef H5
                 if (
-                    CRYPTO_ENABLED &&
+                    cryptoEnabled &&
+                    clientPrivateKey &&
                     result.data &&
                     typeof result.data === "object" &&
                     "signature" in (result.data as Record<string, unknown>)
@@ -335,26 +388,21 @@ function handleUnauthorized<T>(options: RequestOptions, resolve: (value: T) => v
         refreshToken()
             .then(token => {
                 isRefreshing = false;
-                // 通知等待队列
                 refreshQueue.forEach(q => q.resolve(token));
                 refreshQueue = [];
-                // 重试原请求
                 request<T>({ ...options, skipAuth: true })
                     .then(resolve)
                     .catch(reject);
             })
             .catch(err => {
                 isRefreshing = false;
-                // 通知等待队列失败
                 refreshQueue.forEach(q => q.reject(err));
                 refreshQueue = [];
                 reject(err);
             });
     } else {
-        // 已有刷新请求在进行中，加入等待队列
         refreshQueue.push({
-            resolve: (token: string) => {
-                // 用新 token 重试
+            resolve: () => {
                 request<T>({ ...options, skipAuth: true })
                     .then(resolve)
                     .catch(reject);
@@ -368,13 +416,6 @@ function handleUnauthorized<T>(options: RequestOptions, resolve: (value: T) => v
 // 开发模式：模拟响应
 // =================================================
 
-/**
- * 开发模式下使用模拟数据（当后端未就绪时）
- *
- * 调用方式：
- *   requestMock<T>(mockData, delay)
- *   或直接在 request 中判断 DEV_MODE 调用此函数
- */
 export async function requestMock<T>(mockData: T, delay = 300): Promise<T> {
     if (!DEV_MODE) {
         throw new Error("requestMock 仅在开发模式下可用");
