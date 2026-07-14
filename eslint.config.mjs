@@ -39,10 +39,7 @@ export default tseslint.config(
             "@typescript-eslint": tseslint.plugin
         },
         rules: {
-            "@typescript-eslint/no-unused-vars": [
-                "warn",
-                { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }
-            ],
+            "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
             "@typescript-eslint/no-explicit-any": "warn",
             "@typescript-eslint/no-empty-function": "warn",
             "@typescript-eslint/no-non-null-assertion": "warn",
