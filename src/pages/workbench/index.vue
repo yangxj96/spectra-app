@@ -64,58 +64,60 @@ function onMenuClick(menu: MenuItem) {
 </script>
 
 <template>
-    <view class="page">
+    <view class="workbench">
         <uni-nav-bar status-bar fixed :title="t('workbench.title')" />
 
         <!-- #ifdef APP -->
-        <scroll-view class="scroll-body" scroll-y>
+        <scroll-view class="workbench__scroll-body" scroll-y>
             <!-- #endif -->
 
             <!-- 常用功能 -->
-            <view class="section-card">
-                <view class="section-header">
-                    <view class="section-title-bar" />
-                    <text class="section-title">{{ t("workbench.common") }}</text>
+            <view class="workbench__section-card">
+                <view class="workbench__section-header">
+                    <view class="workbench__section-title-bar" />
+                    <text class="workbench__section-title">{{ t("workbench.common") }}</text>
                 </view>
-                <view class="common-grid">
+                <view class="workbench__common-grid">
                     <view
                         v-for="(menu, i) in commonMenus"
                         :key="'c' + i"
-                        class="common-item"
+                        class="workbench__common-item"
                         @tap="onMenuClick(menu)">
-                        <view class="common-icon-box" :style="{ backgroundColor: menu.color + '18' }">
-                            <image class="common-icon" :src="DEFAULT_FEATURE" mode="aspectFit" />
+                        <view class="workbench__common-icon-box" :style="{ backgroundColor: menu.color + '18' }">
+                            <image class="workbench__common-icon" :src="DEFAULT_FEATURE" mode="aspectFit" />
                         </view>
-                        <text class="common-name">{{ t(menu.nameKey) }}</text>
-                        <view v-if="menu.badge" class="badge-num">{{ menu.badge > 99 ? '99+' : menu.badge }}</view>
-                        <view v-if="menu.dot" class="badge-dot" />
+                        <text class="workbench__common-name">{{ t(menu.nameKey) }}</text>
+                        <view v-if="menu.badge" class="workbench__badge-num">
+                            {{ menu.badge > 99 ? "99+" : menu.badge }}
+                        </view>
+                        <view v-if="menu.dot" class="workbench__badge-dot" />
                     </view>
                 </view>
             </view>
 
             <!-- 全部功能（按分类） -->
-            <view v-for="(category, ci) in allCategories" :key="'cat' + ci" class="section-card">
-                <view class="section-header">
-                    <view class="section-title-bar" />
-                    <text class="section-title">{{ t(category.titleKey) }}</text>
+            <view v-for="(category, ci) in allCategories" :key="'cat' + ci" class="workbench__section-card">
+                <view class="workbench__section-header">
+                    <view class="workbench__section-title-bar" />
+                    <text class="workbench__section-title">{{ t(category.titleKey) }}</text>
                 </view>
-                <view class="menu-grid">
+                <view class="workbench__menu-grid">
                     <view
                         v-for="(menu, mi) in category.menus"
                         :key="'m' + mi"
-                        class="menu-item"
+                        class="workbench__menu-item"
                         @tap="onMenuClick(menu)">
-                        <view class="menu-icon-box" :style="{ backgroundColor: menu.color + '15' }">
-                            <image class="menu-icon" :src="DEFAULT_FEATURE" mode="aspectFit" />
+                        <view class="workbench__menu-icon-box" :style="{ backgroundColor: menu.color + '15' }">
+                            <image class="workbench__menu-icon" :src="DEFAULT_FEATURE" mode="aspectFit" />
                         </view>
-                        <text class="menu-name">{{ t(menu.nameKey) }}</text>
-                        <view v-if="menu.dot" class="badge-dot-menu" />
+                        <text class="workbench__menu-name">{{ t(menu.nameKey) }}</text>
+                        <view v-if="menu.dot" class="workbench__badge-dot-menu" />
                     </view>
                 </view>
             </view>
 
             <!-- 底部安全区 -->
-            <view class="bottom-safe" />
+            <view class="workbench__bottom-safe" />
 
             <!-- #ifdef APP -->
         </scroll-view>
@@ -124,19 +126,19 @@ function onMenuClick(menu: MenuItem) {
 </template>
 
 <style lang="scss" scoped>
-.page {
+.workbench {
     min-height: 100vh;
     background: #f3f4f6;
 }
 
-.scroll-body {
+.workbench__scroll-body {
     height: calc(100vh - 88rpx);
 }
 
 // =================================================
 // 区块卡片
 // =================================================
-.section-card {
+.workbench__section-card {
     background: #fff;
     margin: 20rpx 24rpx;
     border-radius: 20rpx;
@@ -144,13 +146,13 @@ function onMenuClick(menu: MenuItem) {
     box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
-.section-header {
+.workbench__section-header {
     display: flex;
     align-items: center;
     margin-bottom: 24rpx;
 }
 
-.section-title-bar {
+.workbench__section-title-bar {
     width: 6rpx;
     height: 32rpx;
     background: linear-gradient(180deg, #1a6eff, #3b82f6);
@@ -158,7 +160,7 @@ function onMenuClick(menu: MenuItem) {
     margin-right: 16rpx;
 }
 
-.section-title {
+.workbench__section-title {
     font-size: 32rpx;
     font-weight: 700;
     color: #1a1a2e;
@@ -167,12 +169,12 @@ function onMenuClick(menu: MenuItem) {
 // =================================================
 // 常用功能
 // =================================================
-.common-grid {
+.workbench__common-grid {
     display: flex;
     justify-content: space-around;
 }
 
-.common-item {
+.workbench__common-item {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -181,7 +183,7 @@ function onMenuClick(menu: MenuItem) {
     width: 140rpx;
 }
 
-.common-icon-box {
+.workbench__common-icon-box {
     width: 96rpx;
     height: 96rpx;
     border-radius: 24rpx;
@@ -191,18 +193,18 @@ function onMenuClick(menu: MenuItem) {
     margin-bottom: 14rpx;
 }
 
-.common-icon {
+.workbench__common-icon {
     width: 52rpx;
     height: 52rpx;
 }
 
-.common-name {
+.workbench__common-name {
     font-size: 26rpx;
     color: #333;
     font-weight: 500;
 }
 
-.badge-num {
+.workbench__badge-num {
     position: absolute;
     top: 0;
     right: 16rpx;
@@ -217,7 +219,7 @@ function onMenuClick(menu: MenuItem) {
     padding: 0 8rpx;
 }
 
-.badge-dot {
+.workbench__badge-dot {
     position: absolute;
     top: 4rpx;
     right: 20rpx;
@@ -231,12 +233,12 @@ function onMenuClick(menu: MenuItem) {
 // =================================================
 // 全部功能网格
 // =================================================
-.menu-grid {
+.workbench__menu-grid {
     display: flex;
     flex-wrap: wrap;
 }
 
-.menu-item {
+.workbench__menu-item {
     width: 25%;
     display: flex;
     flex-direction: column;
@@ -246,7 +248,7 @@ function onMenuClick(menu: MenuItem) {
     box-sizing: border-box;
 }
 
-.menu-icon-box {
+.workbench__menu-icon-box {
     width: 80rpx;
     height: 80rpx;
     border-radius: 20rpx;
@@ -256,17 +258,17 @@ function onMenuClick(menu: MenuItem) {
     margin-bottom: 10rpx;
 }
 
-.menu-icon {
+.workbench__menu-icon {
     width: 44rpx;
     height: 44rpx;
 }
 
-.menu-name {
+.workbench__menu-name {
     font-size: 24rpx;
     color: #555;
 }
 
-.badge-dot-menu {
+.workbench__badge-dot-menu {
     position: absolute;
     top: 14rpx;
     right: 16rpx;
@@ -279,7 +281,7 @@ function onMenuClick(menu: MenuItem) {
 // =================================================
 // 底部
 // =================================================
-.bottom-safe {
+.workbench__bottom-safe {
     height: 40rpx;
 }
 </style>

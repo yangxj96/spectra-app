@@ -15,11 +15,11 @@ import zh from "./zh.json";
 import en from "./en.json";
 
 function getLocale(): string {
-    const saved = uni.getStorageSync("locale")
-    if (saved) return saved
-    const system = uni.getLocale()
-    if (system.startsWith("zh")) return "zh"
-    return "en"
+    const saved = uni.getStorageSync("locale");
+    if (saved) return saved;
+    const system = uni.getLocale();
+    if (system.startsWith("zh")) return "zh";
+    return "en";
 }
 
 const i18n = createI18n({
@@ -33,8 +33,8 @@ const i18n = createI18n({
 });
 
 export function setLocale(locale: "zh" | "en") {
-    i18n.global.locale.value = locale
-    uni.setStorageSync("locale", locale)
+    i18n.global.locale.value = locale;
+    uni.setStorageSync("locale", locale);
 }
 
 export default i18n;

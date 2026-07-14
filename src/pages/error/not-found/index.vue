@@ -1,11 +1,11 @@
 <template>
-    <view class="container">
-        <view class="content">
-            <text class="code">404</text>
-            <text class="title">{{ t("error.not_found") }}</text>
-            <text class="desc">{{ t("error.not_found_desc") }}</text>
-            <view class="btn" @tap="goHome">
-                <text class="btn-text">{{ t("error.back_home") }}</text>
+    <view class="error-not-found__container">
+        <view class="error-not-found__content">
+            <text class="error-not-found__code">404</text>
+            <text class="error-not-found__title">{{ t("error.not_found") }}</text>
+            <text class="error-not-found__desc">{{ t("error.not_found_desc") }}</text>
+            <view class="error-not-found__btn" @tap="goHome">
+                <text class="error-not-found__btn-text">{{ t("error.back_home") }}</text>
             </view>
         </view>
     </view>
@@ -22,7 +22,7 @@ function goHome() {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.error-not-found__container {
     height: 100vh;
     display: flex;
     align-items: center;
@@ -30,42 +30,42 @@ function goHome() {
     background: $uni-bg-color;
 }
 
-.content {
+.error-not-found__content {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 0 40rpx;
 }
 
-.code {
+.error-not-found__code {
     font-size: 120rpx;
     font-weight: bold;
     color: $uni-text-color-grey;
     line-height: 1.2;
 }
 
-.title {
+.error-not-found__title {
     margin-top: 24rpx;
     font-size: 36rpx;
     font-weight: 500;
     color: $uni-text-color;
 }
 
-.desc {
+.error-not-found__desc {
     margin-top: 16rpx;
     font-size: 28rpx;
     color: $uni-text-color-grey;
     text-align: center;
 }
 
-.btn {
+.error-not-found__btn {
     margin-top: 60rpx;
     padding: 20rpx 80rpx;
     background: $uni-color-primary;
     border-radius: 48rpx;
 }
 
-.btn-text {
+.error-not-found__btn-text {
     font-size: 30rpx;
     color: #ffffff;
 }

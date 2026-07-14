@@ -48,7 +48,7 @@ async function handleLogout() {
 <template>
     <uni-nav-bar status-bar fixed title="" />
 
-    <view class="header-box">
+    <view class="mine__header-box">
         <uni-row>
             <uni-col :span="8" style="height: 100%; display: flex; justify-content: center; align-items: center">
                 <t-avatar :image="userAvatar" shape="round" size="200rpx" @error="handleAvatarError" />
@@ -72,7 +72,7 @@ async function handleLogout() {
     <!-- #ifdef APP -->
     <scroll-view style="flex: 1">
         <!-- #endif -->
-        <view class="features-group">
+        <view class="mine__features-group">
             <t-cell-group>
                 <t-cell :title="t('mine.service')" hover arrow>
                     <template #left-icon>
@@ -82,7 +82,7 @@ async function handleLogout() {
             </t-cell-group>
         </view>
 
-        <view class="features-group">
+        <view class="mine__features-group">
             <t-cell-group>
                 <t-cell :title="t('mine.favorites')" hover arrow>
                     <template #left-icon>
@@ -92,7 +92,7 @@ async function handleLogout() {
             </t-cell-group>
         </view>
 
-        <view class="features-group">
+        <view class="mine__features-group">
             <t-cell-group>
                 <t-cell :title="t('mine.settings')" hover arrow>
                     <template #left-icon>
@@ -103,7 +103,7 @@ async function handleLogout() {
         </view>
 
         <!-- 退出登录 -->
-        <view class="features-group">
+        <view class="mine__features-group">
             <t-cell-group>
                 <t-cell hover @click="handleLogout">
                     <template #title>
@@ -124,7 +124,7 @@ page {
 </style>
 
 <style lang="scss" scoped>
-.header-box {
+.mine__header-box {
     height: 240rpx;
     background-color: white;
     padding-left: 20rpx;
@@ -137,7 +137,7 @@ page {
     border-bottom-style: none !important;
 }
 
-.features-group {
+.mine__features-group {
     margin-top: 20rpx;
     background-color: white;
 }

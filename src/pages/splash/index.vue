@@ -3,10 +3,10 @@
     <scroll-view style="flex: 1">
         <!-- #endif -->
 
-        <view class="container">
+        <view class="splash__container">
             <view class="splash">
-                <image class="logo" src="/static/logo.png" />
-                <text class="title">{{ t("app.splash_title") }}</text>
+                <image class="splash__logo" src="/static/logo.png" />
+                <text class="splash__title">{{ t("app.splash_title") }}</text>
             </view>
         </view>
 
@@ -41,7 +41,7 @@ function next() {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.splash__container {
     height: 100vh;
     display: flex;
     align-items: center;
@@ -55,12 +55,12 @@ function next() {
     align-items: center;
 }
 
-.logo {
+.splash__logo {
     width: 140px;
     height: 140px;
 }
 
-.title {
+.splash__title {
     margin-top: 20px;
     font-size: 22px;
     font-weight: bold;

@@ -160,23 +160,23 @@ function onContactTap(contact: Contact) {
     <view class="page">
         <uni-nav-bar status-bar fixed :title="t('contacts.title')" />
 
-        <view class="content-box">
+        <view class="contacts__content-box">
             <!-- 搜索栏 -->
             <uni-search-bar :placeholder="t('contacts.search_placeholder')" />
 
             <!-- 功能列表 -->
-            <view class="func-list">
-                <view v-for="(item, i) in funcList" :key="'f' + i" class="func-item" @tap="onFuncTap(item)">
-                    <view class="func-icon-box">
-                        <text class="func-icon">{{ item.icon }}</text>
+            <view class="contacts__func-list">
+                <view v-for="(item, i) in funcList" :key="'f' + i" class="contacts__func-item" @tap="onFuncTap(item)">
+                    <view class="contacts__func-icon-box">
+                        <text class="contacts__func-icon">{{ item.icon }}</text>
                     </view>
-                    <text class="func-name">{{ t(item.nameKey) }}</text>
+                    <text class="contacts__func-name">{{ t(item.nameKey) }}</text>
                     <t-badge v-if="item.badge" :count="item.badge" :offset="[-8, 0]" />
                 </view>
             </view>
 
             <!-- 通讯录（按字母分组 + 右侧索引） -->
-            <t-indexes :sticky="true" :sticky-offset="120" class="indexes-wrap" :show-tips="false">
+            <t-indexes :sticky="true" :sticky-offset="120" class="contacts__indexes-wrap" :show-tips="false">
                 <block v-for="(group, gi) in contactList" :key="'g' + gi">
                     <t-indexes-anchor :index="group.index" />
                     <t-cell-group>
@@ -186,12 +186,12 @@ function onContactTap(contact: Contact) {
                             hover
                             @click="onContactTap(contact)">
                             <template #left-icon>
-                                <view class="contact-avatar-box">
-                                    <image class="contact-avatar" :src="contact.avatar" mode="aspectFill" />
+                                <view class="contacts__avatar-box">
+                                    <image class="contacts__avatar" :src="contact.avatar" mode="aspectFill" />
                                 </view>
                             </template>
                             <template #title>
-                                <text class="contact-name">{{ contact.name }}</text>
+                                <text class="contacts__name">{{ contact.name }}</text>
                             </template>
                         </t-cell>
                     </t-cell-group>
@@ -209,7 +209,7 @@ function onContactTap(contact: Contact) {
     background: #f5f6f7;
 }
 
-.content-box {
+.contacts__content-box {
     padding-top: var(--window-top);
     flex: 1;
     display: flex;
@@ -219,14 +219,14 @@ function onContactTap(contact: Contact) {
 // =================================================
 // 功能列表
 // =================================================
-.func-list {
+.contacts__func-list {
     background: #fff;
     padding: 12rpx 0;
     display: flex;
     gap: 0;
 }
 
-.func-item {
+.contacts__func-item {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -235,7 +235,7 @@ function onContactTap(contact: Contact) {
     position: relative;
 }
 
-.func-icon-box {
+.contacts__func-icon-box {
     width: 88rpx;
     height: 88rpx;
     border-radius: 20rpx;
@@ -246,11 +246,11 @@ function onContactTap(contact: Contact) {
     margin-bottom: 10rpx;
 }
 
-.func-icon {
+.contacts__func-icon {
     font-size: 40rpx;
 }
 
-.func-name {
+.contacts__func-name {
     font-size: 24rpx;
     color: #333;
 }
@@ -258,7 +258,7 @@ function onContactTap(contact: Contact) {
 // =================================================
 // 通讯录
 // =================================================
-.indexes-wrap {
+.contacts__indexes-wrap {
     flex: 1;
     padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
 
@@ -268,19 +268,19 @@ function onContactTap(contact: Contact) {
     }
 }
 
-.contact-avatar-box {
+.contacts__avatar-box {
     width: 72rpx;
     height: 72rpx;
     margin-right: 20rpx;
 }
 
-.contact-avatar {
+.contacts__avatar {
     width: 72rpx;
     height: 72rpx;
     border-radius: 12rpx;
 }
 
-.contact-name {
+.contacts__name {
     font-size: 30rpx;
     color: #333;
 }

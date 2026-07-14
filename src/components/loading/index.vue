@@ -1,10 +1,10 @@
 <template>
-    <view v-if="visible" class="loading-mask" @tap.stop>
-        <view class="loading-content">
-            <view class="loading-spinner">
-                <view v-for="i in 3" :key="i" class="dot" />
+    <view v-if="visible" class="loading__mask" @tap.stop>
+        <view class="loading__content">
+            <view class="loading__spinner">
+                <view v-for="i in 3" :key="i" class="loading__dot" />
             </view>
-            <text class="loading-text">{{ text }}</text>
+            <text class="loading__text">{{ text }}</text>
         </view>
     </view>
 </template>
@@ -23,7 +23,7 @@ withDefaults(
 </script>
 
 <style lang="scss" scoped>
-.loading-mask {
+.loading__mask {
     position: fixed;
     top: 0;
     left: 0;
@@ -36,7 +36,7 @@ withDefaults(
     z-index: 999;
 }
 
-.loading-content {
+.loading__content {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -45,12 +45,12 @@ withDefaults(
     border-radius: 16rpx;
 }
 
-.loading-spinner {
+.loading__spinner {
     display: flex;
     gap: 12rpx;
 }
 
-.dot {
+.loading__dot {
     width: 16rpx;
     height: 16rpx;
     border-radius: 50%;
@@ -77,7 +77,7 @@ withDefaults(
     }
 }
 
-.loading-text {
+.loading__text {
     margin-top: 20rpx;
     font-size: 28rpx;
     color: #ffffff;

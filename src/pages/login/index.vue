@@ -242,45 +242,54 @@ function showComingSoon(feature: string) {
 </script>
 
 <template>
-    <view class="login-page">
+    <view class="login">
         <!-- 顶部品牌区 -->
-        <view class="brand-section">
-            <view class="brand-logo">
-                <image class="logo-img" src="/static/logo.png" mode="aspectFit" />
+        <view class="login__brand-section">
+            <view class="login__brand-logo">
+                <image class="login__logo-img" src="/static/logo.png" mode="aspectFit" />
             </view>
-            <view class="brand-name">{{ t("app.name") }}</view>
-            <view class="brand-subtitle">{{ t("login.brand_slogan") }}</view>
+            <view class="login__brand-name">{{ t("app.name") }}</view>
+            <view class="login__brand-subtitle">{{ t("login.brand_slogan") }}</view>
         </view>
 
         <!-- 表单卡片区 -->
-        <view class="form-card">
+        <view class="login__form-card">
             <!-- 欢迎语 -->
-            <view class="form-header">
-                <text class="form-title">{{ t("login.welcome_back") }}</text>
-                <text class="form-desc">{{ t("login.welcome_desc") }}</text>
+            <view class="login__form-header">
+                <text class="login__form-title">{{ t("login.welcome_back") }}</text>
+                <text class="login__form-desc">{{ t("login.welcome_desc") }}</text>
             </view>
 
             <!-- 登录方式切换 -->
-            <view class="type-tabs">
-                <view class="type-tab" :class="{ active: loginType === 'PASSWORD' }" @tap="switchType('PASSWORD')">
+            <view class="login__type-tabs">
+                <view
+                    class="login__type-tab"
+                    :class="{ 'login__type-tab--active': loginType === 'PASSWORD' }"
+                    @tap="switchType('PASSWORD')">
                     <text>{{ t("login.type_password") }}</text>
                 </view>
-                <view class="type-tab" :class="{ active: loginType === 'SMS' }" @tap="switchType('SMS')">
+                <view
+                    class="login__type-tab"
+                    :class="{ 'login__type-tab--active': loginType === 'SMS' }"
+                    @tap="switchType('SMS')">
                     <text>{{ t("login.type_sms") }}</text>
                 </view>
-                <view class="type-tab" :class="{ active: loginType === 'EMAIL' }" @tap="switchType('EMAIL')">
+                <view
+                    class="login__type-tab"
+                    :class="{ 'login__type-tab--active': loginType === 'EMAIL' }"
+                    @tap="switchType('EMAIL')">
                     <text>{{ t("login.type_email") }}</text>
                 </view>
             </view>
 
             <!-- 账号输入 -->
-            <view class="input-group">
-                <view class="input-icon">
-                    <text class="icon-text">{{ loginType === "SMS" ? "📱" : "👤" }}</text>
+            <view class="login__input-group">
+                <view class="login__input-icon">
+                    <text class="login__icon-text">{{ loginType === "SMS" ? "📱" : "👤" }}</text>
                 </view>
                 <input
                     v-model="form.username"
-                    class="input-field"
+                    class="login__input-field"
                     :placeholder="
                         loginType === 'SMS'
                             ? t('login.placeholder_phone')
@@ -293,53 +302,53 @@ function showComingSoon(feature: string) {
 
             <!-- 密码模式 -->
             <template v-if="isPasswordMode">
-                <view class="input-group">
-                    <view class="input-icon">
-                        <text class="icon-text">🔒</text>
+                <view class="login__input-group">
+                    <view class="login__input-icon">
+                        <text class="login__icon-text">🔒</text>
                     </view>
                     <input
                         v-model="form.password"
-                        class="input-field"
+                        class="login__input-field"
                         :password="!passwordVisible"
                         :placeholder="t('login.placeholder_password')"
                         placeholder-style="color: #bbb; font-size: 28rpx;" />
-                    <view class="input-suffix" @click="togglePassword">
+                    <view class="login__input-suffix" @click="togglePassword">
                         <text>{{ passwordVisible ? "🙈" : "👁️" }}</text>
                     </view>
                 </view>
 
-                <view class="input-group">
-                    <view class="input-icon">
-                        <text class="icon-text">🛡️</text>
+                <view class="login__input-group">
+                    <view class="login__input-icon">
+                        <text class="login__icon-text">🛡️</text>
                     </view>
                     <input
                         v-model="form.captcha"
-                        class="input-field"
+                        class="login__input-field"
                         :placeholder="t('login.placeholder_captcha')"
                         placeholder-style="color: #bbb; font-size: 28rpx;"
                         maxlength="4" />
-                    <view class="captcha-img-wrap" @tap.stop="refreshCaptcha">
-                        <image v-if="captchaImage" class="captcha-img" :src="captchaImage" mode="aspectFit" />
+                    <view class="login__captcha-img-wrap" @tap.stop="refreshCaptcha">
+                        <image v-if="captchaImage" class="login__captcha-img" :src="captchaImage" mode="aspectFit" />
                     </view>
                 </view>
             </template>
 
             <!-- 验证码模式 -->
             <template v-else>
-                <view class="input-group">
-                    <view class="input-icon">
-                        <text class="icon-text">🔑</text>
+                <view class="login__input-group">
+                    <view class="login__input-icon">
+                        <text class="login__icon-text">🔑</text>
                     </view>
                     <input
                         v-model="form.code"
-                        class="input-field"
+                        class="login__input-field"
                         :placeholder="t('login.placeholder_code')"
                         placeholder-style="color: #bbb; font-size: 28rpx;"
                         maxlength="6"
                         type="number" />
                     <view
-                        class="code-btn"
-                        :class="{ disabled: countdown > 0 }"
+                        class="login__code-btn"
+                        :class="{ 'login__code-btn--disabled': countdown > 0 }"
                         @tap="countdown > 0 ? undefined : handleSendCode()">
                         <text>{{ countdownText }}</text>
                     </view>
@@ -347,46 +356,51 @@ function showComingSoon(feature: string) {
             </template>
 
             <!-- 协议勾选 -->
-            <view class="protocol-row">
-                <view class="checkbox" :class="{ checked: agreeProtocol }" @tap="agreeProtocol = !agreeProtocol">
-                    <text v-if="agreeProtocol" class="check-icon">✓</text>
+            <view class="login__protocol-row">
+                <view
+                    class="login__checkbox"
+                    :class="{ 'login__checkbox--checked': agreeProtocol }"
+                    @tap="agreeProtocol = !agreeProtocol">
+                    <text v-if="agreeProtocol" class="login__check-icon">✓</text>
                 </view>
-                <text class="protocol-text">{{ t("login.protocol_agree") }}</text>
-                <view class="protocol-link" @tap="goAgreement('user')">{{ t("login.protocol_user") }}</view>
-                <text class="protocol-text">{{ t("login.protocol_and") }}</text>
-                <view class="protocol-link" @tap="goAgreement('privacy')">{{ t("login.protocol_privacy") }}</view>
+                <text class="login__protocol-text">{{ t("login.protocol_agree") }}</text>
+                <view class="login__protocol-link" @tap="goAgreement('user')">{{ t("login.protocol_user") }}</view>
+                <text class="login__protocol-text">{{ t("login.protocol_and") }}</text>
+                <view class="login__protocol-link" @tap="goAgreement('privacy')">
+                    {{ t("login.protocol_privacy") }}
+                </view>
             </view>
 
             <!-- 登录按钮 -->
-            <button class="login-btn" :disabled="isLoggingIn" @tap="handleLogin">
+            <button class="login__btn" :disabled="isLoggingIn" @tap="handleLogin">
                 <text v-if="!isLoggingIn">{{ t("login.submit") }}</text>
-                <view v-else class="loading-row">
-                    <text class="loading-icon">⏳</text>
+                <view v-else class="login__loading-row">
+                    <text class="login__loading-icon">⏳</text>
                     <text>{{ t("login.submitting") }}</text>
                 </view>
             </button>
 
             <!-- 底部链接 -->
-            <view class="form-footer">
-                <view class="footer-link" @tap.stop="showComingSoon(t('login.forgot_password'))">
+            <view class="login__form-footer">
+                <view class="login__footer-link" @tap.stop="showComingSoon(t('login.forgot_password'))">
                     <text>{{ t("login.forgot_password") }}</text>
                 </view>
-                <text class="footer-divider">|</text>
-                <view class="footer-link" @tap.stop="showComingSoon(t('login.register'))">
+                <text class="login__footer-divider">|</text>
+                <view class="login__footer-link" @tap.stop="showComingSoon(t('login.register'))">
                     <text>{{ t("login.register") }}</text>
                 </view>
             </view>
         </view>
 
         <!-- 底部版本信息 -->
-        <view class="version-info">
+        <view class="login__version-info">
             <text>v1.0.0</text>
         </view>
     </view>
 </template>
 
 <style lang="scss" scoped>
-.login-page {
+.login {
     min-height: 100vh;
     background: linear-gradient(160deg, #1a6eff 0%, #3b82f6 30%, #60a5fa 60%, #93c5fd 100%);
     display: flex;
@@ -397,7 +411,7 @@ function showComingSoon(feature: string) {
 // =================================================
 // 品牌区
 // =================================================
-.brand-section {
+.login__brand-section {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -406,7 +420,7 @@ function showComingSoon(feature: string) {
     padding-bottom: 60rpx;
 }
 
-.brand-logo {
+.login__brand-logo {
     width: 120rpx;
     height: 120rpx;
     border-radius: 28rpx;
@@ -418,12 +432,12 @@ function showComingSoon(feature: string) {
     box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
 }
 
-.logo-img {
+.login__logo-img {
     width: 76rpx;
     height: 76rpx;
 }
 
-.brand-name {
+.login__brand-name {
     margin-top: 24rpx;
     font-size: 44rpx;
     font-weight: 700;
@@ -431,7 +445,7 @@ function showComingSoon(feature: string) {
     letter-spacing: 8rpx;
 }
 
-.brand-subtitle {
+.login__brand-subtitle {
     margin-top: 10rpx;
     font-size: 24rpx;
     color: rgba(255, 255, 255, 0.8);
@@ -441,7 +455,7 @@ function showComingSoon(feature: string) {
 // =================================================
 // 表单卡片
 // =================================================
-.form-card {
+.login__form-card {
     width: calc(100% - 48rpx);
     background: #fff;
     border-radius: 48rpx;
@@ -450,11 +464,11 @@ function showComingSoon(feature: string) {
     box-sizing: border-box;
 }
 
-.form-header {
+.login__form-header {
     margin-bottom: 40rpx;
 }
 
-.form-title {
+.login__form-title {
     display: block;
     font-size: 40rpx;
     font-weight: 700;
@@ -462,7 +476,7 @@ function showComingSoon(feature: string) {
     margin-bottom: 12rpx;
 }
 
-.form-desc {
+.login__form-desc {
     font-size: 26rpx;
     color: #999;
 }
@@ -470,13 +484,13 @@ function showComingSoon(feature: string) {
 // =================================================
 // 登录方式切换
 // =================================================
-.type-tabs {
+.login__type-tabs {
     display: flex;
     gap: 16rpx;
     margin-bottom: 36rpx;
 }
 
-.type-tab {
+.login__type-tab {
     flex: 1;
     height: 72rpx;
     display: flex;
@@ -488,7 +502,7 @@ function showComingSoon(feature: string) {
     color: #666;
     transition: all 0.2s;
 
-    &.active {
+    &--active {
         background: #1a6eff;
         color: #fff;
         font-weight: 600;
@@ -498,7 +512,7 @@ function showComingSoon(feature: string) {
 // =================================================
 // 输入框
 // =================================================
-.input-group {
+.login__input-group {
     display: flex;
     align-items: center;
     height: 100rpx;
@@ -513,7 +527,7 @@ function showComingSoon(feature: string) {
     }
 }
 
-.input-icon {
+.login__input-icon {
     width: 56rpx;
     height: 56rpx;
     border-radius: 16rpx;
@@ -525,18 +539,18 @@ function showComingSoon(feature: string) {
     flex-shrink: 0;
 }
 
-.icon-text {
+.login__icon-text {
     font-size: 28rpx;
 }
 
-.input-field {
+.login__input-field {
     flex: 1;
     height: 100%;
     font-size: 28rpx;
     color: #333;
 }
 
-.input-suffix {
+.login__input-suffix {
     padding: 12rpx;
     font-size: 28rpx;
     opacity: 0.5;
@@ -549,7 +563,7 @@ function showComingSoon(feature: string) {
 // =================================================
 // 图形验证码
 // =================================================
-.captcha-img-wrap {
+.login__captcha-img-wrap {
     width: 180rpx;
     height: 60rpx;
     flex-shrink: 0;
@@ -562,7 +576,7 @@ function showComingSoon(feature: string) {
     justify-content: center;
 }
 
-.captcha-img {
+.login__captcha-img {
     width: 100%;
     height: 100%;
 }
@@ -570,7 +584,7 @@ function showComingSoon(feature: string) {
 // =================================================
 // 发送验证码按钮
 // =================================================
-.code-btn {
+.login__code-btn {
     flex-shrink: 0;
     margin-left: 16rpx;
     padding: 0 24rpx;
@@ -584,7 +598,7 @@ function showComingSoon(feature: string) {
     color: #fff;
     white-space: nowrap;
 
-    &.disabled {
+    &--disabled {
         background: #c0c4cc;
     }
 }
@@ -592,13 +606,13 @@ function showComingSoon(feature: string) {
 // =================================================
 // 协议
 // =================================================
-.protocol-row {
+.login__protocol-row {
     display: flex;
     align-items: center;
     margin: 32rpx 0;
 }
 
-.checkbox {
+.login__checkbox {
     width: 36rpx;
     height: 36rpx;
     border-radius: 50%;
@@ -610,25 +624,25 @@ function showComingSoon(feature: string) {
     flex-shrink: 0;
     transition: all 0.2s;
 
-    &.checked {
+    &--checked {
         background: #1a6eff;
         border-color: #1a6eff;
     }
 }
 
-.check-icon {
+.login__check-icon {
     color: #fff;
     font-size: 22rpx;
     font-weight: bold;
 }
 
-.protocol-text {
+.login__protocol-text {
     font-size: 24rpx;
     color: #999;
     line-height: 1.5;
 }
 
-.protocol-link {
+.login__protocol-link {
     color: #1a6eff;
     display: inline-block;
     padding: 4rpx 0;
@@ -637,7 +651,7 @@ function showComingSoon(feature: string) {
 // =================================================
 // 登录按钮
 // =================================================
-.login-btn {
+.login__btn {
     width: 100%;
     height: 96rpx;
     background: linear-gradient(135deg, #1a6eff, #3b82f6);
@@ -664,20 +678,20 @@ function showComingSoon(feature: string) {
     }
 }
 
-.loading-row {
+.login__loading-row {
     display: flex;
     align-items: center;
     gap: 12rpx;
 }
 
-.loading-icon {
+.login__loading-icon {
     font-size: 28rpx;
 }
 
 // =================================================
 // 底部链接
 // =================================================
-.form-footer {
+.login__form-footer {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -685,13 +699,13 @@ function showComingSoon(feature: string) {
     gap: 24rpx;
 }
 
-.footer-link {
+.login__footer-link {
     font-size: 26rpx;
     color: #1a6eff;
     display: inline;
 }
 
-.footer-divider {
+.login__footer-divider {
     color: #ddd;
     font-size: 24rpx;
 }
@@ -699,7 +713,7 @@ function showComingSoon(feature: string) {
 // =================================================
 // 版本号
 // =================================================
-.version-info {
+.login__version-info {
     margin-top: auto;
     padding: 24rpx 0 40rpx;
     width: 100%;

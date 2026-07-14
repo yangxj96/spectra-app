@@ -100,18 +100,18 @@ const handlerItemClick = (item: MessageItem) => {
         <uni-search-bar :focus="false" :placeholder="t('message.search_placeholder')" />
         <!-- 列表区域（可滚动 + 下拉刷新） -->
         <scroll-view
-            class="list-scroll"
+            class="message__list-scroll"
             scroll-y
             refresher-enabled
             :refresher-triggered="refreshing"
             @refresherrefresh="onListRefresh">
             <!-- 骨架屏 -->
-            <view v-if="loading" class="skeleton-list">
-                <view v-for="i in 5" :key="i" class="skeleton-item">
-                    <view class="skeleton-avatar">
+            <view v-if="loading" class="message__skeleton-list">
+                <view v-for="i in 5" :key="i" class="message__skeleton-item">
+                    <view class="message__skeleton-avatar">
                         <t-skeleton :row-col="[[{ width: '90rpx', height: '90rpx' }]]" />
                     </view>
-                    <view class="skeleton-content">
+                    <view class="message__skeleton-content">
                         <t-skeleton :row-col="[[{ width: '30%' }], [{ width: '55%' }]]" />
                     </view>
                 </view>
@@ -139,15 +139,15 @@ const handlerItemClick = (item: MessageItem) => {
 }
 
 /* 列表滚动区域 */
-.list-scroll {
+.message__list-scroll {
     flex: 1;
 }
 
-.skeleton-list {
+.message__skeleton-list {
     padding: 0;
 }
 
-.skeleton-item {
+.message__skeleton-item {
     display: flex;
     align-items: center;
     height: 130rpx;
@@ -155,12 +155,12 @@ const handlerItemClick = (item: MessageItem) => {
     box-sizing: border-box;
 }
 
-.skeleton-avatar {
+.message__skeleton-avatar {
     flex-shrink: 0;
     margin-right: 20rpx;
 }
 
-.skeleton-content {
+.message__skeleton-content {
     flex: 1;
     min-width: 0;
     padding: 4rpx 0;

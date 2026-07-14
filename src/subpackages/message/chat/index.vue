@@ -58,17 +58,27 @@ function sendMessage() {
     scrollToBottom();
 
     // 模拟对方回复
-    const replies = ["收到，我看看哈", "好的，明白了", "稍等，我确认一下", "没问题 👍", "这个我待会回复你", "嗯嗯，了解"];
+    const replies = [
+        "收到，我看看哈",
+        "好的，明白了",
+        "稍等，我确认一下",
+        "没问题 👍",
+        "这个我待会回复你",
+        "嗯嗯，了解"
+    ];
     const reply = replies[Math.floor(Math.random() * replies.length)];
-    setTimeout(() => {
-        messages.push({
-            id: nextId++,
-            content: reply,
-            from: "other",
-            time: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes() + 1).padStart(2, "0")}`
-        });
-        scrollToBottom();
-    }, 800 + Math.random() * 1200);
+    setTimeout(
+        () => {
+            messages.push({
+                id: nextId++,
+                content: reply,
+                from: "other",
+                time: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes() + 1).padStart(2, "0")}`
+            });
+            scrollToBottom();
+        },
+        800 + Math.random() * 1200
+    );
 }
 
 /** 滚动到的消息 id */
@@ -77,7 +87,7 @@ const scrollIntoView = ref("");
 function scrollToBottom() {
     nextTick(() => {
         const last = messages[messages.length - 1];
-    if (last) scrollIntoView.value = `msg-${last.id}`;
+        if (last) scrollIntoView.value = `msg-${last.id}`;
     });
 }
 
@@ -86,61 +96,70 @@ scrollToBottom();
 </script>
 
 <template>
-    <view class="chat-page">
+    <view class="chat">
         <!-- 顶部导航 -->
         <uni-nav-bar status-bar fixed :title="contactName" left-icon="left" @click-left="goBack" />
 
         <!-- 消息列表 -->
-        <scroll-view class="msg-scroll" scroll-y scroll-with-animation :scroll-into-view="scrollIntoView" :show-scrollbar="false" enhanced>
-            <view class="msg-list">
+        <scroll-view
+            class="chat__msg-scroll"
+            scroll-y
+            scroll-with-animation
+            :scroll-into-view="scrollIntoView"
+            :show-scrollbar="false"
+            enhanced>
+            <view class="chat__msg-list">
                 <!-- 时间标签 -->
-                <view class="time-tag">
-                    <text class="time-text">2026-06-25 09:30</text>
+                <view class="chat__time-tag">
+                    <text class="chat__time-text">2026-06-25 09:30</text>
                 </view>
 
                 <view
                     v-for="msg in messages"
                     :id="'msg-' + msg.id"
                     :key="msg.id"
-                    class="msg-row"
-                    :class="msg.from === 'self' ? 'msg-self' : 'msg-other'">
+                    class="chat__msg-row"
+                    :class="msg.from === 'self' ? 'chat__msg-row--self' : 'chat__msg-row--other'">
                     <!-- 对方头像 -->
-                    <view v-if="msg.from === 'other'" class="avatar-box">
-                        <image class="avatar" src="/static/default/avatar.png" mode="aspectFill" />
+                    <view v-if="msg.from === 'other'" class="chat__avatar-box">
+                        <image class="chat__avatar" src="/static/default/avatar.png" mode="aspectFill" />
                     </view>
 
                     <!-- 气泡 -->
-                    <view class="msg-body">
-                        <view class="bubble" :class="msg.from === 'self' ? 'bubble-self' : 'bubble-other'">
-                            <text class="bubble-text">{{ msg.content }}</text>
+                    <view class="chat__msg-body">
+                        <view
+                            class="chat__bubble"
+                            :class="msg.from === 'self' ? 'chat__bubble--self' : 'chat__bubble--other'">
+                            <text class="chat__bubble-text">{{ msg.content }}</text>
                         </view>
                     </view>
 
                     <!-- 自己头像 -->
-                    <view v-if="msg.from === 'self'" class="avatar-box">
-                        <image class="avatar" src="/static/example/avatar.jpg" mode="aspectFill" />
+                    <view v-if="msg.from === 'self'" class="chat__avatar-box">
+                        <image class="chat__avatar" src="/static/example/avatar.jpg" mode="aspectFill" />
                     </view>
                 </view>
             </view>
         </scroll-view>
 
         <!-- 底部输入栏 -->
-        <view class="input-bar">
+        <view class="chat__input-bar">
             <input
                 v-model="inputText"
-                class="msg-input"
+                class="chat__msg-input"
                 :placeholder="t('chat.input_placeholder')"
                 placeholder-style="color: #bbb"
                 confirm-type="send"
-                @confirm="sendMessage"
-            />
-            <button class="send-btn" :disabled="!inputText.trim()" @tap="sendMessage">{{ t("chat.send") }}</button>
+                @confirm="sendMessage" />
+            <button class="chat__send-btn" :disabled="!inputText.trim()" @tap="sendMessage">
+                {{ t("chat.send") }}
+            </button>
         </view>
     </view>
 </template>
 
 <style lang="scss" scoped>
-.chat-page {
+.chat {
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -149,7 +168,7 @@ scrollToBottom();
 }
 
 // 消息列表
-.msg-scroll {
+.chat__msg-scroll {
     flex: 1;
     min-height: 0;
     padding: 20rpx 28rpx 0;
@@ -164,7 +183,7 @@ scrollToBottom();
 }
 
 // 底部输入栏
-.input-bar {
+.chat__input-bar {
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -175,18 +194,18 @@ scrollToBottom();
     gap: 16rpx;
 }
 
-.msg-list {
+.chat__msg-list {
     padding-bottom: 20rpx;
 }
 
 // 时间标签
-.time-tag {
+.chat__time-tag {
     display: flex;
     justify-content: center;
     margin: 16rpx 0 24rpx;
 }
 
-.time-text {
+.chat__time-text {
     font-size: 22rpx;
     color: #b0b0b0;
     background: #dcdcdc;
@@ -195,77 +214,81 @@ scrollToBottom();
 }
 
 // 消息行
-.msg-row {
+.chat__msg-row {
     display: flex;
     align-items: flex-start;
     margin-bottom: 24rpx;
+
+    &--self {
+        justify-content: flex-end;
+    }
+
+    &--other {
+        justify-content: flex-start;
+    }
 }
 
-.msg-self {
-    justify-content: flex-end;
-}
-
-.avatar-box {
+.chat__avatar-box {
     flex-shrink: 0;
 }
 
-.avatar {
+.chat__avatar {
     width: 72rpx;
     height: 72rpx;
     border-radius: 10rpx;
 }
 
-.msg-body {
+.chat__msg-body {
     max-width: 70%;
 }
 
 // 气泡
-.bubble {
+.chat__bubble {
     padding: 18rpx 24rpx;
     border-radius: 12rpx;
     position: relative;
     word-break: break-all;
-}
 
-.bubble-other {
-    background: #fff;
-    margin-left: 16rpx;
-    border-top-left-radius: 4rpx;
+    &--other {
+        background: #fff;
+        margin-left: 16rpx;
+        border-top-left-radius: 4rpx;
 
-    &::before {
-        content: "";
-        position: absolute;
-        left: -12rpx;
-        top: 20rpx;
-        border-width: 12rpx 12rpx 12rpx 0;
-        border-style: solid;
-        border-color: transparent #fff transparent transparent;
+        &::before {
+            content: "";
+            position: absolute;
+            left: -12rpx;
+            top: 20rpx;
+            border-width: 12rpx 12rpx 12rpx 0;
+            border-style: solid;
+            border-color: transparent #fff transparent transparent;
+        }
+    }
+
+    &--self {
+        background: #95ec69;
+        margin-right: 16rpx;
+        border-top-right-radius: 4rpx;
+
+        &::before {
+            content: "";
+            position: absolute;
+            right: -12rpx;
+            top: 20rpx;
+            border-width: 12rpx 0 12rpx 12rpx;
+            border-style: solid;
+            border-color: transparent transparent transparent #95ec69;
+        }
     }
 }
 
-.bubble-self {
-    background: #95ec69;
-    margin-right: 16rpx;
-    border-top-right-radius: 4rpx;
-
-    &::before {
-        content: "";
-        position: absolute;
-        right: -12rpx;
-        top: 20rpx;
-        border-width: 12rpx 0 12rpx 12rpx;
-        border-style: solid;
-        border-color: transparent transparent transparent #95ec69;
-    }
-}
-
-.bubble-text {
+.chat__bubble-text {
     font-size: 30rpx;
     color: #333;
     line-height: 1.5;
 }
 
-.msg-input {
+.chat__msg-input {
     flex: 1;
     height: 72rpx;
     background: #fff;
@@ -275,7 +298,7 @@ scrollToBottom();
     color: #333;
 }
 
-.send-btn {
+.chat__send-btn {
     width: 120rpx;
     height: 72rpx;
     background: #07c160;
