@@ -1,3 +1,5 @@
+import type { PushMessagePayload } from "@/types/push";
+
 // 消息类型枚举
 export enum PushMessageType {
     NOTIFICATION = "notification", // 通知消息
@@ -8,7 +10,7 @@ export enum PushMessageType {
 
 // 消息处理器接口
 interface MessageHandler {
-    (data: any, type: string): void | Promise<void>;
+    (data: PushMessagePayload, type: string): void | Promise<void>;
 }
 
 class PushManager {
@@ -22,38 +24,38 @@ class PushManager {
     private init() {
         uni.onPushMessage(res => {
             console.log("[PushManager]收到推送消息:", res);
-            this.handleMessage(res);
+            this.handleMessage(res as unknown as PushMessagePayload);
         });
     }
 
     // 处理消息分发
-    private handleMessage(res: any) {
+    private handleMessage(res: PushMessagePayload) {
         const { type, data } = res;
 
         // 处理点击通知
-        if (type === "click") {
+        if (type === "click" && data) {
             this.handleNotificationClick(data);
         }
 
         // 处理收到消息
-        if (type === "receive") {
+        if (type === "receive" && data) {
             this.handleReceiveMessage(data);
         }
     }
 
     // 处理通知点击
-    private handleNotificationClick(data: any) {
-        const messageType = data.type || PushMessageType.SYSTEM;
+    private handleNotificationClick(data: Record<string, unknown>) {
+        const messageType = (data.type as string) || PushMessageType.SYSTEM;
         console.log("[PushManager]点击通知", messageType, data);
-        this.emit("click", data);
+        this.emit("click", { type: messageType, data } as PushMessagePayload);
     }
 
     // 处理收到的消息（App 前台时）
-    private handleReceiveMessage(data: any) {
-        const messageType = data.type || PushMessageType.SYSTEM;
+    private handleReceiveMessage(data: Record<string, unknown>) {
+        const messageType = (data.type as string) || PushMessageType.SYSTEM;
         console.log("[PushManager]收到消息", messageType, data);
         // 触发事件
-        this.emit("receive", data);
+        this.emit("receive", { type: messageType, data } as PushMessagePayload);
     }
 
     // 事件订阅
@@ -65,7 +67,7 @@ class PushManager {
     }
 
     // 触发事件
-    private emit(event: string, data: any) {
+    private emit(event: string, data: PushMessagePayload) {
         const handlers = this.handlers.get(event);
         if (handlers) {
             handlers.forEach(handler => handler(data, event));

@@ -6,19 +6,35 @@ import { request } from "./http";
 // 基础 HTTP 方法
 // =================================================
 
-export function get<T = any>(url: string, params?: Record<string, any>, header?: Record<string, string>): Promise<T> {
+export function get<T = unknown>(
+    url: string,
+    params?: Record<string, string | number | boolean | null | undefined>,
+    header?: Record<string, string>
+): Promise<T> {
     return request<T>({ url, method: "GET", data: params, header });
 }
 
-export function post<T = any>(url: string, data?: Record<string, any>, header?: Record<string, string>): Promise<T> {
+export function post<T = unknown>(
+    url: string,
+    data?: Record<string, string | number | boolean | null | undefined>,
+    header?: Record<string, string>
+): Promise<T> {
     return request<T>({ url, method: "POST", data, header });
 }
 
-export function put<T = any>(url: string, data?: Record<string, any>, header?: Record<string, string>): Promise<T> {
+export function put<T = unknown>(
+    url: string,
+    data?: Record<string, string | number | boolean | null | undefined>,
+    header?: Record<string, string>
+): Promise<T> {
     return request<T>({ url, method: "PUT", data, header });
 }
 
-export function del<T = any>(url: string, data?: Record<string, any>, header?: Record<string, string>): Promise<T> {
+export function del<T = unknown>(
+    url: string,
+    data?: Record<string, string | number | boolean | null | undefined>,
+    header?: Record<string, string>
+): Promise<T> {
     return request<T>({ url, method: "DELETE", data, header });
 }
 
@@ -34,7 +50,7 @@ export interface UploadOptions {
     /** 文件对应的 key，默认 "file" */
     name?: string;
     /** 额外表单数据 */
-    formData?: Record<string, any>;
+    formData?: Record<string, string | number | Blob>;
     /** 自定义请求头 */
     header?: Record<string, string>;
     /** 上传进度回调 */
@@ -44,7 +60,7 @@ export interface UploadOptions {
 /**
  * 上传文件
  */
-export function upload<T = any>(options: UploadOptions): Promise<T> {
+export function upload<T = unknown>(options: UploadOptions): Promise<T> {
     return new Promise((resolve, reject) => {
         const token = uni.getStorageSync(STORAGE_KEY_TOKEN) as string | null;
         const header: Record<string, string> = { ...options.header };
@@ -164,10 +180,11 @@ export function withLoading<T>(promise: Promise<T>, msg = "加载中..."): Promi
  *
  * 适用于标准分页接口，返回 { list, total, page, pageSize } 结构
  */
-export function getPage<T = any>(
+export function getPage<T = unknown>(
     url: string,
     params: PageRequest,
     header?: Record<string, string>
 ): Promise<PageResponse<T>> {
-    return get<PageResponse<T>>(url, params as unknown as Record<string, any>, header);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return get<PageResponse<T>>(url, params as any, header);
 }

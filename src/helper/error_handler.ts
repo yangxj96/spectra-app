@@ -42,7 +42,7 @@ export function setupErrorHandler() {
  * - 自建日志服务 HTTP 上报
  * - uniCloud 云函数记录
  */
-export function reportError(error: { type: string; message?: string; detail?: any }) {
+export function reportError(error: { type: string; message?: string; detail?: unknown }) {
     console.error("[ErrorReport]", error.type, error.message ?? error.detail);
 
     // TODO: 调用日志上报接口

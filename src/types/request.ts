@@ -12,6 +12,7 @@ export interface RequestOptions {
     /** 请求方法 */
     method?: RequestMethod;
     /** 请求参数（GET 时为 query params，POST/PUT 时为 body） */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data?: Record<string, any>;
     /** 自定义请求头 */
     header?: Record<string, string>;
@@ -28,7 +29,7 @@ export interface RequestOptions {
 }
 
 /** 标准 API 响应结构 */
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
     /** 业务状态码：0 表示成功，非 0 表示失败 */
     code: number;
     /** 响应数据 */
@@ -44,7 +45,7 @@ export interface PageRequest {
 }
 
 /** 分页响应结构 */
-export interface PageResponse<T = any> {
+export interface PageResponse<T = unknown> {
     /** 数据列表 */
     list: T[];
     /** 总条数 */

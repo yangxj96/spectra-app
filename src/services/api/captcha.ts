@@ -33,12 +33,12 @@ export async function getCaptcha(): Promise<{ key: string; image: string }> {
  * 发送手机验证码（无响应体）
  */
 export function sendSmsCode(phone: string): Promise<void> {
-    return request({ url: "/api/auth/sms", method: "POST", data: { phone }, skipAuth: true, noBody: true });
+    return request<void>({ url: "/api/auth/sms", method: "POST", data: { phone }, skipAuth: true, noBody: true });
 }
 
 /**
  * 发送邮箱验证码（无响应体）
  */
 export function sendEmailCode(email: string): Promise<void> {
-    return request({ url: "/api/auth/email", method: "POST", data: { email }, skipAuth: true, noBody: true });
+    return request<void>({ url: "/api/auth/email", method: "POST", data: { email }, skipAuth: true, noBody: true });
 }

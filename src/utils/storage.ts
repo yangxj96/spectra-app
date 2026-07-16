@@ -17,7 +17,7 @@ export const STORAGE_KEYS = {
 /**
  * 读取存储值
  */
-export function getItem<T = any>(key: string): T | null {
+export function getItem<T = unknown>(key: string): T | null {
     try {
         const value = uni.getStorageSync(key);
         if (value === "" || value === null || value === undefined) return null;
@@ -31,7 +31,7 @@ export function getItem<T = any>(key: string): T | null {
 /**
  * 写入存储值
  */
-export function setItem<T = any>(key: string, value: T): void {
+export function setItem<T = unknown>(key: string, value: T): void {
     try {
         uni.setStorageSync(key, value);
     } catch (err) {
@@ -64,7 +64,7 @@ export function clearAll(): void {
 /**
  * 读取 JSON 存储值（自动 JSON.parse）
  */
-export function getJSON<T = any>(key: string): T | null {
+export function getJSON<T = unknown>(key: string): T | null {
     try {
         const value = uni.getStorageSync(key);
         if (value === "" || value === null || value === undefined) return null;
@@ -78,7 +78,7 @@ export function getJSON<T = any>(key: string): T | null {
 /**
  * 写入 JSON 存储值（自动 JSON.stringify）
  */
-export function setJSON<T = any>(key: string, value: T): void {
+export function setJSON<T = unknown>(key: string, value: T): void {
     try {
         uni.setStorageSync(key, JSON.stringify(value));
     } catch (err) {

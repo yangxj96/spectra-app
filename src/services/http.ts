@@ -28,7 +28,7 @@ let clientPrivateKey: string | null = null;
 export async function initCrypto(): Promise<void> {
     if (!CRYPTO_ENABLED) return;
     try {
-        const res = await new Promise<any>((resolve, reject) => {
+        const res = await new Promise<UniApp.RequestSuccessCallbackResult>((resolve, reject) => {
             uni.request({
                 url: API_BASE_URL + "/api/system/crypto/config",
                 method: "GET",
@@ -37,9 +37,10 @@ export async function initCrypto(): Promise<void> {
                 fail: e => reject(e)
             });
         });
-        if (res.statusCode === 200 && res.data?.code === 200) {
-            cryptoEnabled = res.data.data.enabled;
-            serverPublicKey = res.data.data.serverPublicKey;
+        const data = res.data as ApiResponse<{ enabled: boolean; serverPublicKey: string }>;
+        if (res.statusCode === 200 && data?.code === 200) {
+            cryptoEnabled = data.data.enabled;
+            serverPublicKey = data.data.serverPublicKey;
             console.log(`[Crypto] 初始化完成: enabled=${cryptoEnabled}`);
         }
     } catch (e) {
@@ -57,7 +58,7 @@ export async function fetchClientPrivateKey(): Promise<void> {
     try {
         const token = uni.getStorageSync(STORAGE_KEY_TOKEN) as string | null;
         if (!token) return;
-        const res = await new Promise<any>((resolve, reject) => {
+        const res = await new Promise<UniApp.RequestSuccessCallbackResult>((resolve, reject) => {
             uni.request({
                 url: API_BASE_URL + "/api/system/crypto/keypair/client-private",
                 method: "GET",
@@ -67,8 +68,9 @@ export async function fetchClientPrivateKey(): Promise<void> {
                 fail: e => reject(e)
             });
         });
-        if (res.statusCode === 200 && res.data?.code === 200 && res.data.data?.privateKey) {
-            clientPrivateKey = res.data.data.privateKey;
+        const data = res.data as ApiResponse<{ privateKey: string }>;
+        if (res.statusCode === 200 && data?.code === 200 && data.data?.privateKey) {
+            clientPrivateKey = data.data.privateKey;
             console.log("[Crypto] 客户端私钥已获取");
         }
     } catch (e) {
@@ -86,7 +88,7 @@ let isRefreshing = false;
 /** 等待刷新完成的请求队列 */
 let refreshQueue: Array<{
     resolve: (token: string) => void;
-    reject: (err: any) => void;
+    reject: (err: unknown) => void;
 }> = [];
 
 function getToken(): string | null {
@@ -136,7 +138,11 @@ function buildHeader(custom?: Record<string, string>, skipAuth?: boolean): Recor
 /**
  * 将 data 转为 query string（仅 GET 请求）
  */
-function buildUrl(url: string, method?: RequestMethod, data?: Record<string, any>): string {
+function buildUrl(
+    url: string,
+    method?: RequestMethod,
+    data?: Record<string, string | number | boolean | null | undefined>
+): string {
     if ((!method || method === "GET") && data && Object.keys(data).length > 0) {
         const params = Object.entries(data)
             .filter(([, v]) => v !== undefined && v !== null)
@@ -257,7 +263,7 @@ async function encryptRequest(bodyStr: string): Promise<EncryptedBody> {
 /**
  * 解密响应体
  */
-async function decryptResponse(encryptedBody: EncryptedBody): Promise<any> {
+async function decryptResponse(encryptedBody: EncryptedBody): Promise<unknown> {
     if (!serverPublicKey || !clientPrivateKey) {
         throw new Error("密钥未就绪，无法解密响应");
     }
@@ -280,13 +286,13 @@ async function decryptResponse(encryptedBody: EncryptedBody): Promise<any> {
 /**
  * 发起 HTTP 请求
  */
-export async function request<T = any>(options: RequestOptions): Promise<T> {
+export async function request<T = unknown>(options: RequestOptions): Promise<T> {
     const method = options.method ?? "GET";
     const skipAuth = options.skipAuth ?? false;
     const noBody = options.noBody ?? false;
 
     // 加密请求体
-    let requestData: any = options.data;
+    let requestData: RequestOptions["data"] | EncryptedBody = options.data;
     let requestHeader: Record<string, string> | undefined = options.header;
 
     // #ifdef H5
@@ -308,7 +314,7 @@ export async function request<T = any>(options: RequestOptions): Promise<T> {
     return new Promise((resolve, reject) => {
         uni.request({
             url,
-            method: method as any,
+            method: method as UniApp.RequestOptions["method"],
             data: method !== "GET" ? requestData : undefined,
             header: buildHeader(requestHeader, skipAuth),
             timeout: options.timeout ?? REQUEST_TIMEOUT,
@@ -349,9 +355,11 @@ export async function request<T = any>(options: RequestOptions): Promise<T> {
                 ) {
                     try {
                         const encrypted = result.data as unknown as EncryptedBody;
-                        (result as any).data = await decryptResponse(encrypted);
-                    } catch (e: any) {
-                        reject(new ApiError(-1, e.message || "响应解密失败"));
+                        const decrypted = await decryptResponse(encrypted);
+                        Object.assign(result, { data: decrypted });
+                    } catch (e: unknown) {
+                        const message = e instanceof Error ? e.message : "响应解密失败";
+                        reject(new ApiError(-1, message));
                         return;
                     }
                 }
@@ -382,7 +390,7 @@ export async function request<T = any>(options: RequestOptions): Promise<T> {
 /**
  * 处理 401 未授权：刷新 token 后重试原请求
  */
-function handleUnauthorized<T>(options: RequestOptions, resolve: (value: T) => void, reject: (err: any) => void) {
+function handleUnauthorized<T>(options: RequestOptions, resolve: (value: T) => void, reject: (err: unknown) => void) {
     if (!isRefreshing) {
         isRefreshing = true;
         refreshToken()

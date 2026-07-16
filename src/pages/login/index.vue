@@ -69,7 +69,7 @@ watch(agreeProtocol, val => {
     uni.setStorageSync(STORAGE_KEY_AGREE_PROTOCOL, String(val));
 });
 
-onLoad((options: any) => {
+onLoad((options: Record<string, string | undefined>) => {
     if (options.redirect) {
         redirect.value = decodeURIComponent(options.redirect);
     }
@@ -126,8 +126,9 @@ async function handleSendCode() {
             await sendEmailCode(target);
         }
         uni.showToast({ title: t("login.code_sent"), icon: "success" });
-    } catch (err: any) {
-        uni.showToast({ title: err.msg || t("login.code_send_failed"), icon: "none" });
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        uni.showToast({ title: msg || t("login.code_send_failed"), icon: "none" });
     }
 }
 
@@ -195,8 +196,9 @@ async function handleLogin() {
             });
         }
         handleLoginSuccess(result);
-    } catch (err: any) {
-        uni.showToast({ title: err.msg || t("login.failed"), icon: "none" });
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        uni.showToast({ title: msg || t("login.failed"), icon: "none" });
     } finally {
         isLoggingIn.value = false;
     }
