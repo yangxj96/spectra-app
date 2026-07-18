@@ -1,83 +1,36 @@
-import {
-    API_BASE_URL,
-    CRYPTO_ENABLED,
-    DEV_MODE,
-    REQUEST_TIMEOUT,
-    STORAGE_KEY_REFRESH_TOKEN,
-    STORAGE_KEY_TOKEN
-} from "@/config/env";
+import { API_BASE_URL, DEV_MODE, REQUEST_TIMEOUT, STORAGE_KEY_REFRESH_TOKEN, STORAGE_KEY_TOKEN } from "@/config/env";
 import type { ApiResponse, RequestMethod, RequestOptions } from "@/types";
 import { ApiError } from "@/types/index";
-// #ifdef H5
-import { decrypt, encrypt, generateIv, sign, verifySignature } from "@/utils/crypto/crypto-utils";
-// #endif
+import { crypto, type EncryptedBody } from "@/platform/crypto";
 
 // =================================================
-// 加解密配置（从后端动态获取）
+// 扩展请求选项（支持 responseType 等）
 // =================================================
 
-// #ifdef H5
-let cryptoEnabled = false;
-let serverPublicKey: string | null = null;
-let clientPrivateKey: string | null = null;
+export interface RequestRawOptions extends RequestOptions {
+    /** 响应类型（如 arraybuffer） */
+    responseType?: string;
+}
+
+// =================================================
+// 导出加解密初始化方法（保持向后兼容）
+// =================================================
 
 /**
- * 初始化加解密配置（H5 平台）
- * 应用启动时调用，从后端获取加解密开关和服务端公钥
+ * 初始化加解密配置
+ * 应用启动时调用
  */
 export async function initCrypto(): Promise<void> {
-    if (!CRYPTO_ENABLED) return;
-    try {
-        const res = await new Promise<UniApp.RequestSuccessCallbackResult>((resolve, reject) => {
-            uni.request({
-                url: API_BASE_URL + "/api/system/crypto/config",
-                method: "GET",
-                timeout: 10000,
-                success: r => resolve(r),
-                fail: e => reject(e)
-            });
-        });
-        const data = res.data as ApiResponse<{ enabled: boolean; serverPublicKey: string }>;
-        if (res.statusCode === 200 && data?.code === 200) {
-            cryptoEnabled = data.data.enabled;
-            serverPublicKey = data.data.serverPublicKey;
-            console.log(`[Crypto] 初始化完成: enabled=${cryptoEnabled}`);
-        }
-    } catch (e) {
-        console.warn("[Crypto] 初始化失败，加解密已禁用:", e);
-        cryptoEnabled = false;
-    }
+    return crypto.init();
 }
 
 /**
- * 获取客户端私钥（H5 平台）
- * 登录后调用，用于解密响应的 AES 密钥
+ * 获取客户端私钥
+ * 登录后调用
  */
 export async function fetchClientPrivateKey(): Promise<void> {
-    if (!cryptoEnabled) return;
-    try {
-        const token = uni.getStorageSync(STORAGE_KEY_TOKEN) as string | null;
-        if (!token) return;
-        const res = await new Promise<UniApp.RequestSuccessCallbackResult>((resolve, reject) => {
-            uni.request({
-                url: API_BASE_URL + "/api/system/crypto/keypair/client-private",
-                method: "GET",
-                header: { Authorization: `Bearer ${token}` },
-                timeout: 10000,
-                success: r => resolve(r),
-                fail: e => reject(e)
-            });
-        });
-        const data = res.data as ApiResponse<{ privateKey: string }>;
-        if (res.statusCode === 200 && data?.code === 200 && data.data?.privateKey) {
-            clientPrivateKey = data.data.privateKey;
-            console.log("[Crypto] 客户端私钥已获取");
-        }
-    } catch (e) {
-        console.warn("[Crypto] 获取客户端私钥失败:", e);
-    }
+    return crypto.fetchClientPrivateKey();
 }
-// #endif
 
 // =================================================
 // Token 管理
@@ -227,59 +180,6 @@ function redirectToLogin() {
 }
 
 // =================================================
-// 请求加解密（仅 H5 平台可用）
-// =================================================
-
-// #ifdef H5
-type EncryptedBody = {
-    data: string;
-    key: string;
-    iv: string;
-    nonce: string;
-    timestamp: number;
-    signature: string;
-};
-
-/**
- * 加密请求体
- */
-async function encryptRequest(bodyStr: string): Promise<EncryptedBody> {
-    if (!serverPublicKey) {
-        throw new Error("服务端公钥未就绪，无法加密请求");
-    }
-
-    const iv = generateIv();
-    const timestamp = Math.floor(Date.now() / 1000);
-    const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
-
-    const { encryptedData, encryptedKey } = await encrypt(bodyStr, iv, serverPublicKey);
-
-    const signContent = `data=${encryptedData}&nonce=${nonce}&timestamp=${timestamp}`;
-    const signature = await sign(signContent, clientPrivateKey!);
-
-    return { data: encryptedData, key: encryptedKey, iv, nonce, timestamp, signature };
-}
-
-/**
- * 解密响应体
- */
-async function decryptResponse(encryptedBody: EncryptedBody): Promise<unknown> {
-    if (!serverPublicKey || !clientPrivateKey) {
-        throw new Error("密钥未就绪，无法解密响应");
-    }
-
-    const signData = `data=${encryptedBody.data}&nonce=${encryptedBody.nonce}&timestamp=${encryptedBody.timestamp}`;
-    const isValid = await verifySignature(encryptedBody.signature, signData, serverPublicKey);
-    if (!isValid) {
-        throw new Error("签名验证失败，数据可能被篡改");
-    }
-
-    const json = await decrypt(encryptedBody.key, encryptedBody.data, encryptedBody.iv, clientPrivateKey);
-    return JSON.parse(json) as unknown;
-}
-// #endif
-
-// =================================================
 // 核心请求方法
 // =================================================
 
@@ -295,13 +195,12 @@ export async function request<T = unknown>(options: RequestOptions): Promise<T> 
     let requestData: RequestOptions["data"] | EncryptedBody = options.data;
     let requestHeader: Record<string, string> | undefined = options.header;
 
-    // #ifdef H5
-    if (cryptoEnabled && method !== "GET" && options.data) {
+    // 通过平台抽象处理加密（平台内部处理条件编译）
+    if (crypto.isEnabled() && method !== "GET" && options.data) {
         const bodyStr = JSON.stringify(options.data);
-        requestData = await encryptRequest(bodyStr);
+        requestData = await crypto.encryptRequest(bodyStr);
         requestHeader = { ...requestHeader, "X-Encrypted": "1" };
     }
-    // #endif
 
     // 构建完整 URL（GET 时 data 用于 query params）
     const url = buildUrl(API_BASE_URL + options.url, method, method === "GET" ? options.data : undefined);
@@ -344,18 +243,16 @@ export async function request<T = unknown>(options: RequestOptions): Promise<T> 
                 // 解析业务响应 { code, data, msg }
                 const result = res.data as ApiResponse<T>;
 
-                // 解密响应体
-                // #ifdef H5
+                // 通过平台抽象处理解密（平台内部处理条件编译）
                 if (
-                    cryptoEnabled &&
-                    clientPrivateKey &&
+                    crypto.isEnabled() &&
                     result.data &&
                     typeof result.data === "object" &&
                     "signature" in (result.data as Record<string, unknown>)
                 ) {
                     try {
                         const encrypted = result.data as unknown as EncryptedBody;
-                        const decrypted = await decryptResponse(encrypted);
+                        const decrypted = await crypto.decryptResponse(encrypted);
                         Object.assign(result, { data: decrypted });
                     } catch (e: unknown) {
                         const message = e instanceof Error ? e.message : "响应解密失败";
@@ -363,7 +260,6 @@ export async function request<T = unknown>(options: RequestOptions): Promise<T> 
                         return;
                     }
                 }
-                // #endif
 
                 if (result.code === 200) {
                     resolve(result.data);
@@ -430,4 +326,57 @@ export async function requestMock<T>(mockData: T, delay = 300): Promise<T> {
     }
     await new Promise(resolve => setTimeout(resolve, delay));
     return mockData;
+}
+
+// =================================================
+// 原始响应请求（支持 responseType 等）
+// =================================================
+
+/**
+ * 发起 HTTP 请求，返回原始响应（包含 header、statusCode 等）
+ * 适用于需要访问响应头或特殊响应类型（如 arraybuffer）的场景
+ */
+export async function requestRaw(options: RequestRawOptions): Promise<UniApp.RequestSuccessCallbackResult> {
+    const method = options.method ?? "GET";
+    const skipAuth = options.skipAuth ?? false;
+
+    // 构建完整 URL（GET 时 data 用于 query params）
+    const url = buildUrl(API_BASE_URL + options.url, method, method === "GET" ? options.data : undefined);
+
+    // 显示 loading
+    if (options.showLoading) {
+        uni.showLoading({ title: options.loadingText ?? "加载中...", mask: true });
+    }
+
+    return new Promise((resolve, reject) => {
+        uni.request({
+            url,
+            method: method as UniApp.RequestOptions["method"],
+            data: method !== "GET" ? options.data : undefined,
+            header: buildHeader(options.header, skipAuth),
+            timeout: options.timeout ?? REQUEST_TIMEOUT,
+            responseType: options.responseType as "arraybuffer",
+
+            success(res) {
+                if (options.showLoading) {
+                    uni.hideLoading();
+                }
+
+                if (res.statusCode !== 200) {
+                    reject(new ApiError(res.statusCode, `请求失败(${res.statusCode})`));
+                    return;
+                }
+
+                resolve(res);
+            },
+
+            fail(err) {
+                if (options.showLoading) {
+                    uni.hideLoading();
+                }
+
+                reject(new ApiError(-1, err.errMsg || "网络异常，请检查网络连接"));
+            }
+        });
+    });
 }

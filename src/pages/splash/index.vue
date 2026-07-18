@@ -16,14 +16,14 @@
 </template>
 
 <script setup lang="ts">
+import { onLoad } from "@dcloudio/uni-app";
 import { bootstrap } from "@/helper/bootstrap";
 import { STORAGE_KEY_TOKEN } from "@/config/env";
 import { useI18n } from "vue-i18n";
-import { onMounted } from "vue";
 
 const { t } = useI18n();
 
-onMounted(async () => {
+onLoad(async () => {
     await bootstrap();
     // 控制最小展示时间（避免闪屏）
     await new Promise(resolve => setTimeout(resolve, 1000));

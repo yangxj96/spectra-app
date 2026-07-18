@@ -1,32 +1,21 @@
 import { API_BASE_URL } from "@/config/env";
-import { request } from "../http";
+import { request, requestRaw } from "../http";
 
 /**
  * 获取图形验证码
  * 返回 { key, image }，key 需随登录请求一同提交
  */
 export async function getCaptcha(): Promise<{ key: string; image: string }> {
-    return new Promise((resolve, reject) => {
-        uni.request({
-            url: API_BASE_URL + "/api/common/kaptcha",
-            method: "GET",
-            responseType: "arraybuffer",
-            header: { "Api-Version": "1.0.0" },
-            success(res) {
-                if (res.statusCode !== 200) {
-                    reject(new Error(`获取验证码失败(${res.statusCode})`));
-                    return;
-                }
-                const key = (res.header && (res.header["captcha-key"] || res.header["Captcha-Key"])) || "";
-                const base64 = uni.arrayBufferToBase64(res.data as ArrayBuffer);
-                const image = `data:image/png;base64,${base64}`;
-                resolve({ key, image });
-            },
-            fail(err) {
-                reject(new Error(err.errMsg || "获取验证码失败"));
-            }
-        });
+    const res = await requestRaw({
+        url: "/api/common/kaptcha",
+        method: "GET",
+        responseType: "arraybuffer",
+        skipAuth: true
     });
+    const key = (res.header && (res.header["captcha-key"] || res.header["Captcha-Key"])) || "";
+    const base64 = uni.arrayBufferToBase64(res.data as ArrayBuffer);
+    const image = `data:image/png;base64,${base64}`;
+    return { key, image };
 }
 
 /**

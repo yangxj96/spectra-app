@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { onShow } from "@dcloudio/uni-app";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import useAppStore from "@/stores/app";
 import type { MessageItem } from "@/types/index";
 import { useI18n } from "vue-i18n";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 
 const { t } = useI18n();
 
@@ -18,7 +19,7 @@ const loading = ref(true);
 const appStore = useAppStore();
 const notice = ref("");
 
-onMounted(() => {
+onShow(() => {
     notice.value = appStore.push_id
         ? t("message.push_id_current", { id: appStore.push_id })
         : t("message.push_id_failed");
