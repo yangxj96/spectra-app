@@ -8,9 +8,8 @@ import { ref } from "vue";
 
 const { t } = useI18n();
 
-// #ifdef MP-WEIXIN
+// 页面级认证守卫（平台差异由 hook 内部处理）
 useAuthGuard();
-// #endif
 
 // 刷新状态
 const refreshing = ref(false);
