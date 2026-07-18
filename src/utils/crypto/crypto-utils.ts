@@ -6,7 +6,7 @@ import {
     importRsaPrivateKeyForSign,
     importRsaPublicKey,
     toBufferSource
-} from "./ras-utils";
+} from "./rsa-utils";
 
 /**
  * 生成随机 IV（HEX 格式）

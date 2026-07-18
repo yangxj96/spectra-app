@@ -12,8 +12,7 @@ export interface RequestOptions {
     /** 请求方法 */
     method?: RequestMethod;
     /** 请求参数（GET 时为 query params，POST/PUT 时为 body） */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data?: Record<string, any>;
+    data?: Record<string, string | number | boolean | null | undefined>;
     /** 自定义请求头 */
     header?: Record<string, string>;
     /** 超时时间（毫秒），默认 15000 */

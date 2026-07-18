@@ -185,6 +185,5 @@ export function getPage<T = unknown>(
     params: PageRequest,
     header?: Record<string, string>
 ): Promise<PageResponse<T>> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return get<PageResponse<T>>(url, params as any, header);
+    return get<PageResponse<T>>(url, params as Record<string, string | number | boolean | null | undefined>, header);
 }

@@ -16,8 +16,7 @@ export enum PushMessageType {
  */
 export interface PushMessagePayload {
     type: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data?: Record<string, any>;
+    data?: Record<string, string | number | boolean | null | undefined>;
     [key: string]: unknown;
 }
 

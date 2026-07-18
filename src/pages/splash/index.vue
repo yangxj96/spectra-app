@@ -1,20 +1,3 @@
-<template>
-    <!-- #ifdef APP -->
-    <scroll-view style="flex: 1">
-        <!-- #endif -->
-
-        <view class="splash__container">
-            <view class="splash">
-                <image class="splash__logo" src="/static/logo.png" />
-                <text class="splash__title">{{ t("app.splash_title") }}</text>
-            </view>
-        </view>
-
-        <!-- #ifdef APP -->
-    </scroll-view>
-    <!-- #endif -->
-</template>
-
 <script setup lang="ts">
 import { onLoad } from "@dcloudio/uni-app";
 import { bootstrap } from "@/helper/bootstrap";
@@ -40,6 +23,23 @@ function next() {
 }
 </script>
 
+<template>
+    <!-- #ifdef APP -->
+    <scroll-view style="flex: 1">
+        <!-- #endif -->
+
+        <view class="splash__container">
+            <view class="splash">
+                <image class="splash__logo" src="/static/logo.png" />
+                <text class="splash__title">{{ t("app.splash_title") }}</text>
+            </view>
+        </view>
+
+        <!-- #ifdef APP -->
+    </scroll-view>
+    <!-- #endif -->
+</template>
+
 <style lang="scss" scoped>
 .splash__container {
     height: 100vh;
@@ -56,13 +56,13 @@ function next() {
 }
 
 .splash__logo {
-    width: 140px;
-    height: 140px;
+    width: 280rpx;
+    height: 280rpx;
 }
 
 .splash__title {
-    margin-top: 20px;
-    font-size: 22px;
+    margin-top: 40rpx;
+    font-size: 44rpx;
     font-weight: bold;
 }
 </style>

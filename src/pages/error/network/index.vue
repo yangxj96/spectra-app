@@ -1,3 +1,13 @@
+<script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+
+function retry() {
+    uni.navigateBack({ delta: 1 });
+}
+</script>
+
 <template>
     <view class="error-network__container">
         <view class="error-network__content">
@@ -12,16 +22,6 @@
         </view>
     </view>
 </template>
-
-<script setup lang="ts">
-import { useI18n } from "vue-i18n";
-
-const { t } = useI18n();
-
-function retry() {
-    uni.navigateBack({ delta: 1 });
-}
-</script>
 
 <style lang="scss" scoped>
 .error-network__container {

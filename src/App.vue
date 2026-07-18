@@ -2,9 +2,9 @@
 import { onError, onExit, onHide, onLaunch, onPageNotFound, onShow, onUnhandledRejection } from "@dcloudio/uni-app";
 import { useI18n } from "vue-i18n";
 import { DEV_MODE } from "@/config/env";
-import { setupErrorHandler, reportError } from "@/helper/error_handler";
-import { pushManager } from "@/helper/push_message";
-import { setupNetworkListener } from "@/hooks/useNetwork";
+import { setupErrorHandler, reportError } from "@/helper/error-handler";
+import { pushManager } from "@/helper/push-message";
+import { setupNetworkListener } from "@/hooks/use-network";
 import useAppStore from "@/stores/app";
 
 const { t } = useI18n();

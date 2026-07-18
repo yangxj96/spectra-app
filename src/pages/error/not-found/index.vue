@@ -1,3 +1,13 @@
+<script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+
+function goHome() {
+    uni.reLaunch({ url: "/pages/message/index" });
+}
+</script>
+
 <template>
     <view class="error-not-found__container">
         <view class="error-not-found__content">
@@ -10,16 +20,6 @@
         </view>
     </view>
 </template>
-
-<script setup lang="ts">
-import { useI18n } from "vue-i18n";
-
-const { t } = useI18n();
-
-function goHome() {
-    uni.reLaunch({ url: "/pages/message/index" });
-}
-</script>
 
 <style lang="scss" scoped>
 .error-not-found__container {

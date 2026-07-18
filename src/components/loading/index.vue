@@ -1,14 +1,3 @@
-<template>
-    <view v-if="visible" class="loading__mask" @tap.stop>
-        <view class="loading__content">
-            <view class="loading__spinner">
-                <view v-for="i in 3" :key="i" class="loading__dot" />
-            </view>
-            <text class="loading__text">{{ text }}</text>
-        </view>
-    </view>
-</template>
-
 <script setup lang="ts">
 withDefaults(
     defineProps<{
@@ -21,6 +10,17 @@ withDefaults(
     }
 );
 </script>
+
+<template>
+    <view v-if="visible" class="loading__mask" @tap.stop>
+        <view class="loading__content">
+            <view class="loading__spinner">
+                <view v-for="i in 3" :key="i" class="loading__dot" />
+            </view>
+            <text class="loading__text">{{ text }}</text>
+        </view>
+    </view>
+</template>
 
 <style lang="scss" scoped>
 .loading__mask {

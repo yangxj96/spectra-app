@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onShow } from "@dcloudio/uni-app";
-import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useAuthGuard } from "@/hooks/use-auth-guard";
 import useAppStore from "@/stores/app";
 import type { MessageItem } from "@/types/index";
 import { useI18n } from "vue-i18n";
